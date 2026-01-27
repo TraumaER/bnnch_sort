@@ -1,17 +1,18 @@
 package xyz.bannach.betterinventorysorter.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
+import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
+import xyz.bannach.betterinventorysorter.server.SortHandler;
 
 public class SortKeyHandler {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final KeyMapping SORT_KEY = new KeyMapping(
             "key.betterinventorysorter.sort",
@@ -45,16 +46,25 @@ public class SortKeyHandler {
     }
 
     private static void handleSortInput(AbstractContainerScreen<?> screen) {
-        LOGGER.info("Sort key pressed on screen: {}", screen.getClass().getSimpleName());
-        LOGGER.info("Menu type: {}", screen.getMenu().getClass().getSimpleName());
-        LOGGER.info("Total slots: {}", screen.getMenu().slots.size());
-
         Slot hoveredSlot = screen.getSlotUnderMouse();
-        if (hoveredSlot != null) {
-            LOGGER.info("Hovered slot index: {}, container slot: {}, container: {}",
-                    hoveredSlot.index, hoveredSlot.getContainerSlot(), hoveredSlot.container.getClass().getSimpleName());
-        } else {
-            LOGGER.info("No slot hovered");
+        if (hoveredSlot == null) {
+            return;
         }
+
+        int region = determineRegion(hoveredSlot);
+        PacketDistributor.sendToServer(new SortRequestPayload(region));
+    }
+
+    private static int determineRegion(Slot slot) {
+        if (!(slot.container instanceof Inventory)) {
+            return SortHandler.REGION_CONTAINER;
+        }
+        int containerSlot = slot.getContainerSlot();
+        if (containerSlot >= 0 && containerSlot <= 8) {
+            return SortHandler.REGION_PLAYER_HOTBAR;
+        } else if (containerSlot >= 9 && containerSlot <= 35) {
+            return SortHandler.REGION_PLAYER_MAIN;
+        }
+        return SortHandler.REGION_CONTAINER;
     }
 }

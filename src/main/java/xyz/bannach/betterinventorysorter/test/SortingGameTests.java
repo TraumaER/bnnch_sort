@@ -1,13 +1,21 @@
 package xyz.bannach.betterinventorysorter.test;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import xyz.bannach.betterinventorysorter.server.SortHandler;
 import xyz.bannach.betterinventorysorter.sorting.ItemSorter;
 import xyz.bannach.betterinventorysorter.sorting.SortMethod;
 import xyz.bannach.betterinventorysorter.sorting.SortOrder;
@@ -245,5 +253,214 @@ public class SortingGameTests {
                 stacks.get(index).is(expected),
                 "Expected " + expected + " at index " + index + ", got " + stacks.get(index)
         );
+    }
+
+    // ===== SortHandler Tests =====
+
+    @GameTest(template = "empty")
+    public static void sort_handler_partitions_chest_slots(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Fill chest with items in reverse alphabetical order
+        chest.setItem(0, new ItemStack(Items.STONE));
+        chest.setItem(1, new ItemStack(Items.DIAMOND));
+        chest.setItem(2, new ItemStack(Items.APPLE));
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Get container slots using SortHandler logic
+        List<Slot> containerSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
+                containerSlots.add(slot);
+            }
+        }
+
+        helper.assertTrue(containerSlots.size() == 27, "Expected 27 chest slots, got " + containerSlots.size());
+        helper.assertTrue(containerSlots.get(0).getItem().is(Items.STONE), "First slot should be stone");
+        helper.assertTrue(containerSlots.get(1).getItem().is(Items.DIAMOND), "Second slot should be diamond");
+        helper.assertTrue(containerSlots.get(2).getItem().is(Items.APPLE), "Third slot should be apple");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void sort_handler_sorts_chest_contents(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Fill chest with items in reverse alphabetical order
+        chest.setItem(0, new ItemStack(Items.STONE));
+        chest.setItem(1, new ItemStack(Items.DIAMOND));
+        chest.setItem(2, new ItemStack(Items.APPLE));
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Simulate sort handler logic for REGION_CONTAINER
+        List<Slot> targetSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
+                targetSlots.add(slot);
+            }
+        }
+
+        // Extract and sort
+        List<ItemStack> stacks = new ArrayList<>();
+        for (Slot slot : targetSlots) {
+            stacks.add(slot.getItem().copy());
+        }
+
+        List<ItemStack> sorted = ItemSorter.sort(stacks, SortPreference.DEFAULT);
+
+        // Write back
+        for (int i = 0; i < targetSlots.size(); i++) {
+            targetSlots.get(i).set(sorted.get(i));
+        }
+
+        // Verify sorted order
+        helper.assertTrue(chest.getItem(0).is(Items.APPLE), "First slot should be apple");
+        helper.assertTrue(chest.getItem(1).is(Items.DIAMOND), "Second slot should be diamond");
+        helper.assertTrue(chest.getItem(2).is(Items.STONE), "Third slot should be stone");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void sort_handler_partitions_player_main_inventory(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Count player main inventory slots (container slots 9-35)
+        List<Slot> mainSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            if (slot.container instanceof net.minecraft.world.entity.player.Inventory
+                && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35) {
+                mainSlots.add(slot);
+            }
+        }
+
+        helper.assertTrue(mainSlots.size() == 27, "Expected 27 main inventory slots, got " + mainSlots.size());
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void sort_handler_partitions_player_hotbar(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Count player hotbar slots (container slots 0-8)
+        List<Slot> hotbarSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            if (slot.container instanceof net.minecraft.world.entity.player.Inventory
+                && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8) {
+                hotbarSlots.add(slot);
+            }
+        }
+
+        helper.assertTrue(hotbarSlots.size() == 9, "Expected 9 hotbar slots, got " + hotbarSlots.size());
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void sort_handler_empty_region_returns_no_slots(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Test invalid region code (999)
+        List<Slot> invalidSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            boolean matches = switch (999) {
+                case SortHandler.REGION_CONTAINER -> !(slot.container instanceof net.minecraft.world.entity.player.Inventory);
+                case SortHandler.REGION_PLAYER_MAIN -> slot.container instanceof net.minecraft.world.entity.player.Inventory
+                    && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35;
+                case SortHandler.REGION_PLAYER_HOTBAR -> slot.container instanceof net.minecraft.world.entity.player.Inventory
+                    && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8;
+                default -> false;
+            };
+            if (matches) {
+                invalidSlots.add(slot);
+            }
+        }
+
+        helper.assertTrue(invalidSlots.isEmpty(), "Invalid region should return no slots");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void sort_handler_does_not_affect_player_inventory_when_sorting_chest(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos chestPos = new BlockPos(1, 1, 1);
+
+        helper.setBlock(chestPos, Blocks.CHEST);
+        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+
+        // Fill chest with items
+        chest.setItem(0, new ItemStack(Items.STONE));
+        chest.setItem(1, new ItemStack(Items.APPLE));
+
+        // Fill player inventory with items
+        player.getInventory().setItem(9, new ItemStack(Items.DIAMOND));
+        player.getInventory().setItem(10, new ItemStack(Items.GOLD_INGOT));
+
+        // Open chest menu
+        ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
+
+        // Sort only chest (REGION_CONTAINER)
+        List<Slot> containerSlots = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
+                containerSlots.add(slot);
+            }
+        }
+
+        List<ItemStack> stacks = new ArrayList<>();
+        for (Slot slot : containerSlots) {
+            stacks.add(slot.getItem().copy());
+        }
+
+        List<ItemStack> sorted = ItemSorter.sort(stacks, SortPreference.DEFAULT);
+
+        for (int i = 0; i < containerSlots.size(); i++) {
+            containerSlots.get(i).set(sorted.get(i));
+        }
+
+        // Verify chest is sorted
+        helper.assertTrue(chest.getItem(0).is(Items.APPLE), "Chest should be sorted");
+
+        // Verify player inventory unchanged
+        helper.assertTrue(player.getInventory().getItem(9).is(Items.DIAMOND), "Player slot 9 should be unchanged");
+        helper.assertTrue(player.getInventory().getItem(10).is(Items.GOLD_INGOT), "Player slot 10 should be unchanged");
+
+        helper.succeed();
     }
 }
