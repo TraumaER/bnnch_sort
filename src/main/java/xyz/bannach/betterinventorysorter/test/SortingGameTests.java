@@ -67,9 +67,9 @@ public class SortingGameTests {
         SortPreference pref = new SortPreference(SortMethod.QUANTITY, SortOrder.ASCENDING);
         List<ItemStack> sorted = ItemSorter.sort(stacks, pref);
 
-        helper.assertTrue(sorted.get(0).getCount() == 10, "First should have count 10");
+        helper.assertTrue(sorted.get(0).getCount() == 64, "First should have count 64");
         helper.assertTrue(sorted.get(1).getCount() == 32, "Second should have count 32");
-        helper.assertTrue(sorted.get(2).getCount() == 64, "Third should have count 64");
+        helper.assertTrue(sorted.get(2).getCount() == 10, "Third should have count 10");
 
         helper.succeed();
     }

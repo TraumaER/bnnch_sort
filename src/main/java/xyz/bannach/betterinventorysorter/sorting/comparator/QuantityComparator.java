@@ -10,7 +10,7 @@ public class QuantityComparator implements Comparator<ItemStack> {
 
     @Override
     public int compare(ItemStack a, ItemStack b) {
-        int result = Integer.compare(a.getCount(), b.getCount());
+        int result = Integer.compare(b.getCount(), a.getCount());
         if (result != 0) {
             return result;
         }
