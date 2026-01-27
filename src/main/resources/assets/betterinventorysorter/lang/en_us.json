@@ -1,5 +1,10 @@
 {
-  "itemGroup.betterinventorysorter": "Example Mod Tab",
-  "block.betterinventorysorter.example_block": "Example Block",
-  "item.betterinventorysorter.example_item": "Example Item"
+  "sort_method.betterinventorysorter.alphabetical": "Alphabetical",
+  "sort_method.betterinventorysorter.category": "Category",
+  "sort_method.betterinventorysorter.quantity": "Quantity",
+  "sort_method.betterinventorysorter.mod_id": "Mod ID",
+  "sort_order.betterinventorysorter.ascending": "Ascending",
+  "sort_order.betterinventorysorter.descending": "Descending",
+  "key.betterinventorysorter.sort": "Sort Inventory",
+  "key.categories.betterinventorysorter": "Better Inventory Sorter"
 }
