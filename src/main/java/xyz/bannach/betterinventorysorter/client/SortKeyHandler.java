@@ -2,6 +2,7 @@ package xyz.bannach.betterinventorysorter.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -9,6 +10,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
+import xyz.bannach.betterinventorysorter.network.CycleMethodPayload;
 import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
 import xyz.bannach.betterinventorysorter.server.SortHandler;
 
@@ -30,6 +32,16 @@ public class SortKeyHandler {
             return;
         }
         if (SORT_KEY.isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))) {
+            if (Screen.hasShiftDown()) {
+                PacketDistributor.sendToServer(new CycleMethodPayload(true));
+                event.setCanceled(true);
+                return;
+            }
+            if (Screen.hasControlDown()) {
+                PacketDistributor.sendToServer(new CycleMethodPayload(false));
+                event.setCanceled(true);
+                return;
+            }
             handleSortInput(screen);
             event.setCanceled(true);
         }
@@ -40,6 +52,16 @@ public class SortKeyHandler {
             return;
         }
         if (SORT_KEY.isActiveAndMatches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
+            if (Screen.hasShiftDown()) {
+                PacketDistributor.sendToServer(new CycleMethodPayload(true));
+                event.setCanceled(true);
+                return;
+            }
+            if (Screen.hasControlDown()) {
+                PacketDistributor.sendToServer(new CycleMethodPayload(false));
+                event.setCanceled(true);
+                return;
+            }
             handleSortInput(screen);
             event.setCanceled(true);
         }

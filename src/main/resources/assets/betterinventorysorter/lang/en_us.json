@@ -5,6 +5,7 @@
   "sort_method.betterinventorysorter.mod_id": "Mod ID",
   "sort_order.betterinventorysorter.ascending": "Ascending",
   "sort_order.betterinventorysorter.descending": "Descending",
+  "message.betterinventorysorter.preference_changed": "Sort: %s (%s)",
   "key.betterinventorysorter.sort": "Sort Inventory",
   "key.categories.betterinventorysorter": "Better Inventory Sorter"
 }
