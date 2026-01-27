@@ -23,6 +23,11 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
+    public static void onScreenInit(ScreenEvent.Init.Post event) {
+        ScreenButtonInjector.onScreenInit(event);
+    }
+
+    @SubscribeEvent
     public static void onScreenRender(ScreenEvent.Render.Post event) {
         Component message = ClientPreferenceCache.getDisplayMessage();
         if (message == null) {
