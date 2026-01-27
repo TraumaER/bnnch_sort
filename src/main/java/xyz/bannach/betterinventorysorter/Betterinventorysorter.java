@@ -14,6 +14,7 @@ public class Betterinventorysorter {
 
     public Betterinventorysorter(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

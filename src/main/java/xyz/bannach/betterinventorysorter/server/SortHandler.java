@@ -6,9 +6,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import xyz.bannach.betterinventorysorter.ModAttachments;
 import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
 import xyz.bannach.betterinventorysorter.sorting.ItemSorter;
-import xyz.bannach.betterinventorysorter.sorting.SortPreference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class SortHandler {
             }
 
             // Sort stacks
-            List<ItemStack> sorted = ItemSorter.sort(stacks, SortPreference.DEFAULT);
+            List<ItemStack> sorted = ItemSorter.sort(stacks, player.getData(ModAttachments.SORT_PREFERENCE));
 
             // Write sorted stacks back to slots
             for (int i = 0; i < targetSlots.size(); i++) {
