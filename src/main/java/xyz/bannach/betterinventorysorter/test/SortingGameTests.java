@@ -24,10 +24,40 @@ import xyz.bannach.betterinventorysorter.sorting.SortPreference;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Game tests for core sorting functionality.
+ *
+ * <p>This class contains NeoForge GameTest framework tests that verify the
+ * {@link ItemSorter} and {@link SortHandler} classes work correctly. Tests cover
+ * all sort methods, stack merging, empty slot handling, and menu slot partitioning.</p>
+ *
+ * <h2>Test Categories</h2>
+ * <ul>
+ *   <li>Sort method tests - Verify each comparator sorts correctly</li>
+ *   <li>Stack merging tests - Verify partial stacks are combined properly</li>
+ *   <li>Sort handler tests - Verify menu slot detection and sorting</li>
+ * </ul>
+ *
+ * <h2>Running Tests</h2>
+ * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
+ *
+ * @since 1.0.0
+ * @see ItemSorter
+ * @see SortHandler
+ */
 @GameTestHolder("betterinventorysorter")
 @PrefixGameTestTemplate(false)
 public class SortingGameTests {
 
+    /**
+     * Private constructor to prevent instantiation of this test class.
+     */
+    private SortingGameTests() {}
+
+    /**
+     * Tests alphabetical sorting by item name.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void alphabetical_sort_orders_by_name(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -45,6 +75,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests category sorting groups items by creative tab.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void category_sort_groups_by_tab(GameTestHelper helper) {
         // Items from different creative tabs should be grouped
@@ -65,6 +99,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests quantity sorting orders by stack count.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void quantity_sort_orders_by_count(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -82,6 +120,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests quantity sorting uses alphabetical tiebreaker.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void quantity_sort_tiebreaks_alphabetically(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -99,6 +141,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests mod ID sorting groups items by namespace.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void mod_id_sort_groups_by_namespace(GameTestHelper helper) {
         // All vanilla items share "minecraft" namespace, so they should sort alphabetically
@@ -118,6 +164,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that partial stacks are combined during merging.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void merge_stacks_combines_partial_stacks(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -133,6 +183,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that overflow items create new stacks during merging.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void merge_stacks_overflows_to_new_stack(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -155,6 +209,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that unstackable items are not merged.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void merge_stacks_does_not_merge_unstackable(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -168,6 +226,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that items with different components are not merged.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void merge_stacks_does_not_merge_different_components(GameTestHelper helper) {
         ItemStack plain = new ItemStack(Items.DIAMOND_SWORD);
@@ -187,6 +249,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that descending order reverses the sort result.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void descending_order_reverses_sort(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -204,6 +270,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that empty slots are moved to the end after sorting.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void empty_slots_moved_to_end(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -226,6 +296,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests the full pipeline: condense stacks, then sort.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_pipeline_condenses_then_sorts(GameTestHelper helper) {
         List<ItemStack> stacks = new ArrayList<>();
@@ -248,6 +322,14 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Asserts that an item at the given index matches the expected item type.
+     *
+     * @param helper the test helper for assertions
+     * @param stacks the list of item stacks to check
+     * @param index the index to check
+     * @param expected the expected item type
+     */
     private static void assertItem(GameTestHelper helper, List<ItemStack> stacks, int index, net.minecraft.world.item.Item expected) {
         helper.assertTrue(
                 stacks.get(index).is(expected),
@@ -257,6 +339,10 @@ public class SortingGameTests {
 
     // ===== SortHandler Tests =====
 
+    /**
+     * Tests that chest slots are correctly partitioned.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_partitions_chest_slots(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -289,6 +375,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that chest contents are sorted correctly.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_sorts_chest_contents(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -334,6 +424,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that player main inventory slots are correctly partitioned.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_partitions_player_main_inventory(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -359,6 +453,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that player hotbar slots are correctly partitioned.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_partitions_player_hotbar(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -384,6 +482,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that invalid region codes return no slots.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_empty_region_returns_no_slots(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -416,6 +518,10 @@ public class SortingGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that sorting chest does not affect player inventory.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_handler_does_not_affect_player_inventory_when_sorting_chest(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);

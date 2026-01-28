@@ -23,10 +23,41 @@ import xyz.bannach.betterinventorysorter.sorting.SortPreference;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Game tests for edge cases and special scenarios.
+ *
+ * <p>This class contains NeoForge GameTest framework tests that verify the mod
+ * handles edge cases correctly. Tests cover empty inventories, special containers,
+ * player state validation, and boundary conditions.</p>
+ *
+ * <h2>Test Categories</h2>
+ * <ul>
+ *   <li>Empty inventory tests - Verify sorting handles empty slots gracefully</li>
+ *   <li>Special container tests - Verify crafting tables and furnaces are handled</li>
+ *   <li>Player state tests - Verify spectator mode and closed containers</li>
+ *   <li>Region isolation tests - Verify sorting one region doesn't affect others</li>
+ * </ul>
+ *
+ * <h2>Running Tests</h2>
+ * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
+ *
+ * @since 1.0.0
+ * @see ItemSorter
+ * @see SortHandler
+ */
 @GameTestHolder("betterinventorysorter")
 @PrefixGameTestTemplate(false)
 public class EdgeCaseGameTests {
 
+    /**
+     * Private constructor to prevent instantiation of this test class.
+     */
+    private EdgeCaseGameTests() {}
+
+    /**
+     * Tests sorting an empty container.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void empty_container_sort_is_noop(GameTestHelper helper) {
         // Sorting 27 empty slots should return 27 empty slots with no crash
@@ -45,6 +76,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests sorting a single item among empty slots.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void single_item_sort_works(GameTestHelper helper) {
         // Single item among empties should sort to index 0
@@ -66,6 +101,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that full stacks are not merged with other items.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void max_stack_items_unchanged_by_merge(GameTestHelper helper) {
         // Two full stacks of 64 stone + 64 dirt should stay as separate stacks
@@ -90,6 +129,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that many partial stacks condense to multiple full stacks.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void large_partial_stacks_condense_correctly(GameTestHelper helper) {
         // 10 stacks of 10 stone -> should condense to 1x64 + 1x36
@@ -113,6 +156,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests sorting many identical items doesn't crash.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void all_identical_items_sort_without_crash(GameTestHelper helper) {
         // 5 x 32 stone = 160 total -> condenses to 64+64+32, padded to 5 slots
@@ -141,6 +188,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that hotbar is unchanged when sorting main inventory.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void hotbar_unchanged_when_sorting_main_inventory(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -185,6 +236,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests spectator mode detection for guarding sort requests.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void spectator_mode_player_is_detected(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SPECTATOR);
@@ -194,6 +249,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests detection of closed container state.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void closed_container_returns_empty_slots(GameTestHelper helper) {
         // When no container is open, containerMenu == inventoryMenu
@@ -216,6 +275,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that crafting table slots are rejected for sorting.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void crafting_table_container_slots_rejected(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -228,6 +291,10 @@ public class EdgeCaseGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that furnace slots are rejected for sorting.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void furnace_container_slots_rejected(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);

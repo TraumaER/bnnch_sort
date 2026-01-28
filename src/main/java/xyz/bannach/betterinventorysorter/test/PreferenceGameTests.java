@@ -22,10 +22,40 @@ import xyz.bannach.betterinventorysorter.sorting.SortPreference;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Game tests for the player preference system.
+ *
+ * <p>This class contains NeoForge GameTest framework tests that verify the
+ * {@link SortPreference} and {@link ModAttachments#SORT_PREFERENCE} functionality.
+ * Tests cover default values, persistence, preference cycling, and integration with sorting.</p>
+ *
+ * <h2>Test Categories</h2>
+ * <ul>
+ *   <li>Attachment tests - Verify preferences are stored and retrieved correctly</li>
+ *   <li>Cycling tests - Verify method and order cycling behavior</li>
+ *   <li>Integration tests - Verify sorting uses player preferences</li>
+ * </ul>
+ *
+ * <h2>Running Tests</h2>
+ * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
+ *
+ * @since 1.0.0
+ * @see SortPreference
+ * @see ModAttachments
+ */
 @GameTestHolder("betterinventorysorter")
 @PrefixGameTestTemplate(false)
 public class PreferenceGameTests {
 
+    /**
+     * Private constructor to prevent instantiation of this test class.
+     */
+    private PreferenceGameTests() {}
+
+    /**
+     * Tests that default preference attachment is set correctly.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void preference_attachment_defaults_correctly(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -37,6 +67,10 @@ public class PreferenceGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that preferences persist when set on a player.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void preference_attachment_persists_on_player(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -53,6 +87,10 @@ public class PreferenceGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that sorting uses the player's preference settings.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void sort_uses_player_preference(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -102,6 +140,10 @@ public class PreferenceGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that cycling method advances through all options.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void cycle_method_advances_to_next(GameTestHelper helper) {
         // ALPHABETICAL -> CATEGORY -> QUANTITY -> MOD_ID -> ALPHABETICAL
@@ -126,6 +168,10 @@ public class PreferenceGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that toggling order flips between ascending and descending.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void toggle_order_flips_direction(GameTestHelper helper) {
         SortPreference pref = new SortPreference(SortMethod.ALPHABETICAL, SortOrder.ASCENDING);

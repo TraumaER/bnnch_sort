@@ -23,13 +23,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests for the /bis command functionality.
- * These tests verify the sorting logic used by commands against player inventory regions.
+ * Game tests for the /bis command functionality.
+ *
+ * <p>This class contains NeoForge GameTest framework tests that verify the
+ * command system works correctly. Tests simulate command execution by directly
+ * calling the sorting logic that commands use.</p>
+ *
+ * <h2>Test Categories</h2>
+ * <ul>
+ *   <li>sortinv command tests - Verify main, hotbar, and all regions</li>
+ *   <li>change command tests - Verify preference updates</li>
+ *   <li>reset command tests - Verify default restoration</li>
+ *   <li>Argument parsing tests - Verify method and order validation</li>
+ * </ul>
+ *
+ * <h2>Running Tests</h2>
+ * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
+ *
+ * @since 1.0.0
+ * @see xyz.bannach.betterinventorysorter.commands.ModCommands
  */
 @GameTestHolder("betterinventorysorter")
 @PrefixGameTestTemplate(false)
 public class CommandGameTests {
 
+    /**
+     * Private constructor to prevent instantiation of this test class.
+     */
+    private CommandGameTests() {}
+
+    /**
+     * Tests sorting main inventory via command.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_sortinv_main_sorts_main_inventory(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -59,6 +85,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests sorting hotbar via command.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_sortinv_hotbar_sorts_hotbar(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -88,6 +118,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests sorting both inventory regions via command.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_sortinv_all_sorts_both_regions(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -128,6 +162,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that the change command updates player preferences.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_change_updates_player_preference(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -154,6 +192,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that the reset command restores default preferences.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_reset_restores_defaults(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -179,6 +221,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that command sorting respects player preferences.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_sorting_uses_player_preference(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -212,6 +258,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that invalid sort method names are rejected.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_invalid_method_is_rejected(GameTestHelper helper) {
         // Test that invalid method parsing returns null
@@ -227,6 +277,10 @@ public class CommandGameTests {
         helper.succeed();
     }
 
+    /**
+     * Tests that invalid sort order names are rejected.
+     * @param helper the game test helper
+     */
     @GameTest(template = "empty")
     public static void command_invalid_order_is_rejected(GameTestHelper helper) {
         // Test that invalid order parsing returns null
@@ -240,7 +294,16 @@ public class CommandGameTests {
         helper.succeed();
     }
 
-    // Helper method to sort a player region (simulates what the command does)
+    /**
+     * Helper method to sort a player's inventory region.
+     *
+     * <p>This method simulates what the /bis sortinv command does: extracts items
+     * from the target slots, sorts them, and writes them back.</p>
+     *
+     * @param player the player whose inventory to sort
+     * @param region the region to sort
+     * @param preference the sort preferences to use
+     */
     private static void sortPlayerRegion(Player player, int region, SortPreference preference) {
         InventoryMenu menu = player.inventoryMenu;
         List<Slot> targetSlots = SortHandler.getTargetSlots(menu, region);
@@ -261,7 +324,14 @@ public class CommandGameTests {
         }
     }
 
-    // Helper methods to test parsing logic (mirrors ModCommands parsing)
+    /**
+     * Helper method to parse a sort method from its name.
+     *
+     * <p>Mirrors the parsing logic in ModCommands for testing purposes.</p>
+     *
+     * @param name the serialized name to parse
+     * @return the matching SortMethod, or null if not found
+     */
     private static SortMethod parseMethod(String name) {
         for (SortMethod method : SortMethod.values()) {
             if (method.getSerializedName().equalsIgnoreCase(name)) {
@@ -271,6 +341,14 @@ public class CommandGameTests {
         return null;
     }
 
+    /**
+     * Helper method to parse a sort order from its name.
+     *
+     * <p>Mirrors the parsing logic in ModCommands for testing purposes.</p>
+     *
+     * @param name the serialized name to parse
+     * @return the matching SortOrder, or null if not found
+     */
     private static SortOrder parseOrder(String name) {
         for (SortOrder order : SortOrder.values()) {
             if (order.getSerializedName().equalsIgnoreCase(name)) {

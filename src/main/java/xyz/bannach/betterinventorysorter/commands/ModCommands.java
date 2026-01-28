@@ -31,24 +31,72 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Registers and handles the /bis command tree.
+ *
+ * <p>This class provides Brigadier slash commands for inventory sorting operations.
+ * All commands are registered under the {@code /bis} prefix (Better Inventory Sorter).</p>
+ *
+ * <h2>Available Commands</h2>
+ * <ul>
+ *   <li>{@code /bis sortinv [region]} - Sort player inventory (all, main, or hotbar)</li>
+ *   <li>{@code /bis change <method> <order>} - Change sort preferences</li>
+ *   <li>{@code /bis reset} - Reset preferences to server defaults</li>
+ *   <li>{@code /bis config [key]} - View configuration values</li>
+ *   <li>{@code /bis help} - Display help information</li>
+ * </ul>
+ *
+ * <h2>Side: Common</h2>
+ * <p>Commands are registered on both sides but execute server-side.</p>
+ *
+ * @since 1.0.0
+ * @see SortHandler
+ * @see ItemSorter
+ * @see SortPreference
+ */
 @EventBusSubscriber(modid = Betterinventorysorter.MODID)
 public class ModCommands {
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    private ModCommands() {}
+
+    /**
+     * Suggestion provider for inventory region arguments.
+     * <p>Provides: all, main, hotbar</p>
+     */
     private static final SuggestionProvider<CommandSourceStack> REGION_SUGGESTIONS = (context, builder) ->
             SharedSuggestionProvider.suggest(Stream.of("all", "main", "hotbar"), builder);
 
+    /**
+     * Suggestion provider for sort method arguments.
+     * <p>Provides: alphabetical, category, quantity, mod_id</p>
+     */
     private static final SuggestionProvider<CommandSourceStack> METHOD_SUGGESTIONS = (context, builder) ->
             SharedSuggestionProvider.suggest(
                     Arrays.stream(SortMethod.values()).map(SortMethod::getSerializedName),
                     builder
             );
 
+    /**
+     * Suggestion provider for sort order arguments.
+     * <p>Provides: ascending, descending</p>
+     */
     private static final SuggestionProvider<CommandSourceStack> ORDER_SUGGESTIONS = (context, builder) ->
             SharedSuggestionProvider.suggest(
                     Arrays.stream(SortOrder.values()).map(SortOrder::getSerializedName),
                     builder
             );
 
+    /**
+     * Registers all mod commands during the command registration event.
+     *
+     * <p>This method builds and registers the complete {@code /bis} command tree
+     * with all subcommands and their argument handlers.</p>
+     *
+     * @param event the command registration event
+     */
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
@@ -76,6 +124,16 @@ public class ModCommands {
         );
     }
 
+    /**
+     * Executes the /bis sortinv command to sort player inventory.
+     *
+     * <p>Sorts the specified region of the player's inventory using their current
+     * sort preferences. Valid regions are "all", "main", and "hotbar".</p>
+     *
+     * @param context the command context containing the source
+     * @param region the inventory region to sort
+     * @return 1 on success, 0 on failure
+     */
     private static int executeSortInv(CommandContext<CommandSourceStack> context, String region) {
         ServerPlayer player = context.getSource().getPlayer();
         if (player == null) {
@@ -121,6 +179,16 @@ public class ModCommands {
         return 1;
     }
 
+    /**
+     * Sorts a specific inventory region using the given preferences.
+     *
+     * <p>Extracts items from the target slots, sorts them, and writes them back.
+     * This is a helper method used by {@link #executeSortInv}.</p>
+     *
+     * @param menu the container menu to sort within
+     * @param region the region code to sort
+     * @param preference the sort preferences to apply
+     */
     private static void sortRegion(AbstractContainerMenu menu, int region, SortPreference preference) {
         List<Slot> targetSlots = SortHandler.getTargetSlots(menu, region);
         if (targetSlots.isEmpty()) {
@@ -139,6 +207,14 @@ public class ModCommands {
         }
     }
 
+    /**
+     * Executes the /bis help command to display usage information.
+     *
+     * <p>Shows all available commands and the player's current sort preferences.</p>
+     *
+     * @param context the command context containing the source
+     * @return 1 (always succeeds)
+     */
     private static int executeHelp(CommandContext<CommandSourceStack> context) {
         ServerPlayer player = context.getSource().getPlayer();
         SortPreference current = player != null
@@ -159,6 +235,15 @@ public class ModCommands {
         return 1;
     }
 
+    /**
+     * Executes the /bis change command to update sort preferences.
+     *
+     * <p>Sets the player's sort method and order to the specified values and
+     * syncs the change to the client.</p>
+     *
+     * @param context the command context containing the source and arguments
+     * @return 1 on success, 0 on failure (invalid arguments or not a player)
+     */
     private static int executeChange(CommandContext<CommandSourceStack> context) {
         ServerPlayer player = context.getSource().getPlayer();
         if (player == null) {
@@ -195,6 +280,15 @@ public class ModCommands {
         return 1;
     }
 
+    /**
+     * Executes the /bis reset command to restore default preferences.
+     *
+     * <p>Resets the player's sort preferences to the server-configured defaults
+     * and syncs the change to the client.</p>
+     *
+     * @param context the command context containing the source
+     * @return 1 on success, 0 on failure (not a player)
+     */
     private static int executeReset(CommandContext<CommandSourceStack> context) {
         ServerPlayer player = context.getSource().getPlayer();
         if (player == null) {
@@ -216,6 +310,16 @@ public class ModCommands {
         return 1;
     }
 
+    /**
+     * Executes the /bis config command to display configuration values.
+     *
+     * <p>Shows all config values if no key is specified, or a specific value
+     * if a key (method, order, or button) is provided.</p>
+     *
+     * @param context the command context containing the source
+     * @param key the config key to display, or null for all keys
+     * @return 1 on success, 0 on failure (invalid key)
+     */
     private static int executeConfig(CommandContext<CommandSourceStack> context, String key) {
         if (key == null) {
             context.getSource().sendSuccess(() -> Component.translatable("command.betterinventorysorter.config.header"), false);
@@ -255,6 +359,12 @@ public class ModCommands {
         return 1;
     }
 
+    /**
+     * Parses a sort method from its string name.
+     *
+     * @param name the serialized name of the sort method (case-insensitive)
+     * @return the matching SortMethod, or null if not found
+     */
     private static SortMethod parseMethod(String name) {
         for (SortMethod method : SortMethod.values()) {
             if (method.getSerializedName().equalsIgnoreCase(name)) {
@@ -264,6 +374,12 @@ public class ModCommands {
         return null;
     }
 
+    /**
+     * Parses a sort order from its string name.
+     *
+     * @param name the serialized name of the sort order (case-insensitive)
+     * @return the matching SortOrder, or null if not found
+     */
     private static SortOrder parseOrder(String name) {
         for (SortOrder order : SortOrder.values()) {
             if (order.getSerializedName().equalsIgnoreCase(name)) {
