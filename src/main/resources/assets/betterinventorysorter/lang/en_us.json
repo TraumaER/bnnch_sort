@@ -6,6 +6,7 @@
   "sort_order.betterinventorysorter.ascending": "Ascending",
   "sort_order.betterinventorysorter.descending": "Descending",
   "message.betterinventorysorter.preference_changed": "Sort: %s (%s)",
+  "message.betterinventorysorter.sorted": "Sorted: %s (%s)",
   "key.betterinventorysorter.sort": "Sort Inventory",
   "key.categories.betterinventorysorter": "Better Inventory Sorter",
   "tooltip.betterinventorysorter.sort_button": "Sort: %s (%s)",

@@ -14,7 +14,7 @@ public class ModAttachments {
 
     public static final Supplier<AttachmentType<SortPreference>> SORT_PREFERENCE =
             ATTACHMENT_TYPES.register("sort_preference", () ->
-                    AttachmentType.builder(() -> SortPreference.DEFAULT)
+                    AttachmentType.builder(() -> new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder))
                             .serialize(SortPreference.CODEC)
                             .copyOnDeath()
                             .build()
