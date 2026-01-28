@@ -8,8 +8,7 @@
   "message.betterinventorysorter.preference_changed": "Sort: %s (%s)",
   "message.betterinventorysorter.sorted": "Sorted: %s (%s)",
   "key.betterinventorysorter.sort": "Sort Inventory",
+  "key.betterinventorysorter.cycle_preference": "Cycle Sort Preference",
   "key.categories.betterinventorysorter": "Better Inventory Sorter",
-  "tooltip.betterinventorysorter.sort_button": "Sort: %s (%s)",
-  "tooltip.betterinventorysorter.sort_button_hint_shift": "Shift+Click: Cycle method",
-  "tooltip.betterinventorysorter.sort_button_hint_ctrl": "Ctrl+Click: Toggle order"
+  "tooltip.betterinventorysorter.sort_button": "Sort: %s (%s)"
 }
