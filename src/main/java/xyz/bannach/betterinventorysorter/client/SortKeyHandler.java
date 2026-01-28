@@ -5,6 +5,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -77,9 +79,37 @@ public class SortKeyHandler {
             return;
         }
 
+        if (!isSlotSortable(hoveredSlot)) {
+            return;
+        }
+
         int region = determineRegion(hoveredSlot);
+        AbstractContainerMenu menu = screen.getMenu();
+        if (SortHandler.getTargetSlots(menu, region).isEmpty()) {
+            return;
+        }
+
         PacketDistributor.sendToServer(new SortRequestPayload(region));
         SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
+    }
+
+    private static boolean isSlotSortable(Slot slot) {
+        // Reject special slot subclasses (ResultSlot, FurnaceResultSlot, FurnaceFuelSlot, ArmorSlot, etc.)
+        if (slot.getClass() != Slot.class) {
+            return false;
+        }
+        // Reject armor/offhand slots (Inventory slots outside 0-35)
+        if (slot.container instanceof Inventory) {
+            int index = slot.getContainerSlot();
+            if (index < 0 || index > 35) {
+                return false;
+            }
+        }
+        // Reject crafting grid slots
+        if (slot.container instanceof CraftingContainer) {
+            return false;
+        }
+        return true;
     }
 
     private static int determineRegion(Slot slot) {
@@ -92,6 +122,7 @@ public class SortKeyHandler {
         } else if (containerSlot >= 9 && containerSlot <= 35) {
             return SortHandler.REGION_PLAYER_MAIN;
         }
-        return SortHandler.REGION_CONTAINER;
+        // Armor/offhand slots — should not reach here due to isSlotSortable guard
+        return SortHandler.REGION_PLAYER_MAIN;
     }
 }

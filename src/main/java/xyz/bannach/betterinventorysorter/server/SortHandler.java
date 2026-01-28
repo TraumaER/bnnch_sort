@@ -3,6 +3,7 @@ package xyz.bannach.betterinventorysorter.server;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -10,8 +11,12 @@ import xyz.bannach.betterinventorysorter.ModAttachments;
 import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
 import xyz.bannach.betterinventorysorter.sorting.ItemSorter;
 
+import net.minecraft.world.Container;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SortHandler {
 
@@ -52,11 +57,26 @@ public class SortHandler {
     }
 
     public static List<Slot> getTargetSlots(AbstractContainerMenu menu, int region) {
+        // For REGION_CONTAINER, build a set of containers that have any special slot subclass.
+        // A base Slot sharing a container with a subclass (e.g. furnace ingredient slot) is not sortable.
+        Set<Container> specialContainers = Set.of();
+        if (region == REGION_CONTAINER) {
+            specialContainers = new HashSet<>();
+            for (Slot slot : menu.slots) {
+                if (!(slot.container instanceof Inventory) && slot.getClass() != Slot.class) {
+                    specialContainers.add(slot.container);
+                }
+            }
+        }
+
         List<Slot> slots = new ArrayList<>();
 
         for (Slot slot : menu.slots) {
             boolean matches = switch (region) {
-                case REGION_CONTAINER -> !(slot.container instanceof Inventory);
+                case REGION_CONTAINER -> !(slot.container instanceof Inventory)
+                        && slot.getClass() == Slot.class
+                        && !(slot.container instanceof CraftingContainer)
+                        && !specialContainers.contains(slot.container);
                 case REGION_PLAYER_MAIN -> slot.container instanceof Inventory && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35;
                 case REGION_PLAYER_HOTBAR -> slot.container instanceof Inventory && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8;
                 default -> false;
