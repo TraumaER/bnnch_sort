@@ -6,6 +6,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.CraftingMenu;
+import net.minecraft.world.inventory.FurnaceMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -210,6 +212,30 @@ public class EdgeCaseGameTests {
         List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
         helper.assertTrue(!containerSlots.isEmpty(),
                 "REGION_CONTAINER on chest menu should return non-empty list");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void crafting_table_container_slots_rejected(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        CraftingMenu menu = new CraftingMenu(0, player.getInventory());
+
+        List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
+        helper.assertTrue(containerSlots.isEmpty(),
+                "REGION_CONTAINER on crafting menu should return empty list, got " + containerSlots.size() + " slots");
+
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void furnace_container_slots_rejected(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        FurnaceMenu menu = new FurnaceMenu(0, player.getInventory());
+
+        List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
+        helper.assertTrue(containerSlots.isEmpty(),
+                "REGION_CONTAINER on furnace menu should return empty list, got " + containerSlots.size() + " slots");
 
         helper.succeed();
     }

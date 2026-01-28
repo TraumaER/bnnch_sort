@@ -10,11 +10,11 @@ NeoForge mod for Minecraft 1.21.1 ("Better Inventory Sorter"). Java 21, Gradle 8
 
 All commands use the Windows Gradle wrapper:
 
-- **Build:** `.\gradlew.bat build`
-- **Run client:** `.\gradlew.bat runClient`
-- **Run server:** `.\gradlew.bat runServer`
-- **Run game tests:** `.\gradlew.bat runGameTestServer`
-- **Data generation:** `.\gradlew.bat runData`
+- **Build:** `./gradlew.bat build`
+- **Run client:** `./gradlew.bat runClient`
+- **Run server:** `./gradlew.bat runServer`
+- **Run game tests:** `./gradlew.bat runGameTestServer`
+- **Data generation:** `./gradlew.bat runData`
 
 Game tests use the NeoForge GameTest framework (not JUnit). Tests are filtered by the mod namespace `betterinventorysorter`. The `runGameTestServer` task will crash if no game tests are registered.
 
