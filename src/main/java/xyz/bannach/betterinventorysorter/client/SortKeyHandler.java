@@ -2,7 +2,6 @@ package xyz.bannach.betterinventorysorter.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,7 +11,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
-import xyz.bannach.betterinventorysorter.network.CycleMethodPayload;
+import xyz.bannach.betterinventorysorter.network.CyclePreferencePayload;
 import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
 import xyz.bannach.betterinventorysorter.server.SortHandler;
 
@@ -25,27 +24,30 @@ public class SortKeyHandler {
             "key.categories.betterinventorysorter"
     );
 
+    public static final KeyMapping CYCLE_PREFERENCE_KEY = new KeyMapping(
+            "key.betterinventorysorter.cycle_preference",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_P,
+            "key.categories.betterinventorysorter"
+    );
+
     public static void register(RegisterKeyMappingsEvent event) {
         event.register(SORT_KEY);
+        event.register(CYCLE_PREFERENCE_KEY);
     }
 
     public static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
         if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
             return;
         }
-        if (SORT_KEY.isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))) {
-            if (Screen.hasShiftDown()) {
-                PacketDistributor.sendToServer(new CycleMethodPayload(true));
-                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-                event.setCanceled(true);
-                return;
-            }
-            if (Screen.hasControlDown()) {
-                PacketDistributor.sendToServer(new CycleMethodPayload(false));
-                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-                event.setCanceled(true);
-                return;
-            }
+        InputConstants.Key key = InputConstants.getKey(event.getKeyCode(), event.getScanCode());
+        if (CYCLE_PREFERENCE_KEY.isActiveAndMatches(key)) {
+            PacketDistributor.sendToServer(new CyclePreferencePayload());
+            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
+            event.setCanceled(true);
+            return;
+        }
+        if (SORT_KEY.isActiveAndMatches(key)) {
             handleSortInput(screen);
             event.setCanceled(true);
         }
@@ -55,19 +57,14 @@ public class SortKeyHandler {
         if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
             return;
         }
-        if (SORT_KEY.isActiveAndMatches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
-            if (Screen.hasShiftDown()) {
-                PacketDistributor.sendToServer(new CycleMethodPayload(true));
-                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-                event.setCanceled(true);
-                return;
-            }
-            if (Screen.hasControlDown()) {
-                PacketDistributor.sendToServer(new CycleMethodPayload(false));
-                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-                event.setCanceled(true);
-                return;
-            }
+        InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(event.getButton());
+        if (CYCLE_PREFERENCE_KEY.isActiveAndMatches(mouseKey)) {
+            PacketDistributor.sendToServer(new CyclePreferencePayload());
+            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
+            event.setCanceled(true);
+            return;
+        }
+        if (SORT_KEY.isActiveAndMatches(mouseKey)) {
             handleSortInput(screen);
             event.setCanceled(true);
         }

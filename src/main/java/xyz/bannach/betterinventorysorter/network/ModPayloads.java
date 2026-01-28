@@ -21,8 +21,8 @@ public class ModPayloads {
                 SortHandler::handle
         );
         registrar.playToServer(
-                CycleMethodPayload.TYPE,
-                CycleMethodPayload.STREAM_CODEC,
+                CyclePreferencePayload.TYPE,
+                CyclePreferencePayload.STREAM_CODEC,
                 PreferenceHandler::handle
         );
         registrar.playToClient(

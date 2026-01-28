@@ -2,16 +2,12 @@ package xyz.bannach.betterinventorysorter.client;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 import xyz.bannach.betterinventorysorter.Betterinventorysorter;
-import xyz.bannach.betterinventorysorter.network.CycleMethodPayload;
 import xyz.bannach.betterinventorysorter.network.SortRequestPayload;
-
-import java.util.List;
 
 public class SortButton extends Button {
 
@@ -33,16 +29,8 @@ public class SortButton extends Button {
 
     @Override
     public void onPress() {
-        if (Screen.hasShiftDown()) {
-            PacketDistributor.sendToServer(new CycleMethodPayload(true));
-            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-        } else if (Screen.hasControlDown()) {
-            PacketDistributor.sendToServer(new CycleMethodPayload(false));
-            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-        } else {
-            PacketDistributor.sendToServer(new SortRequestPayload(sortRegion));
-            SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-        }
+        PacketDistributor.sendToServer(new SortRequestPayload(sortRegion));
+        SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
     }
 
     @Override
@@ -61,12 +49,9 @@ public class SortButton extends Button {
             Component status = Component.translatable("tooltip.betterinventorysorter.sort_button",
                     Component.translatable(ClientPreferenceCache.getMethod().getTranslationKey()),
                     Component.translatable(ClientPreferenceCache.getOrder().getTranslationKey()));
-            Component hintShift = Component.translatable("tooltip.betterinventorysorter.sort_button_hint_shift");
-            Component hintCtrl = Component.translatable("tooltip.betterinventorysorter.sort_button_hint_ctrl");
             guiGraphics.renderTooltip(
                     parentScreen.getMinecraft().font,
-                    List.of(status, hintShift, hintCtrl),
-                    java.util.Optional.empty(),
+                    status,
                     mouseX, mouseY
             );
         }
