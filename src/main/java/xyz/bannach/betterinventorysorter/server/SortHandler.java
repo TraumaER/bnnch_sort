@@ -22,7 +22,10 @@ public class SortHandler {
     public static void handle(SortRequestPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) context.player();
+            if (player.isSpectator()) return;
+
             AbstractContainerMenu menu = player.containerMenu;
+            if (payload.region() == REGION_CONTAINER && menu == player.inventoryMenu) return;
 
             List<Slot> targetSlots = getTargetSlots(menu, payload.region());
             if (targetSlots.isEmpty()) {
@@ -48,7 +51,7 @@ public class SortHandler {
         });
     }
 
-    private static List<Slot> getTargetSlots(AbstractContainerMenu menu, int region) {
+    public static List<Slot> getTargetSlots(AbstractContainerMenu menu, int region) {
         List<Slot> slots = new ArrayList<>();
 
         for (Slot slot : menu.slots) {
