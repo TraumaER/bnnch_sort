@@ -25,7 +25,8 @@ public class SortButton extends Button {
     private final int sortRegion;
 
     public SortButton(AbstractContainerScreen<?> parentScreen, int sortRegion) {
-        super(0, 0, SIZE, SIZE, Component.empty(), b -> {}, DEFAULT_NARRATION);
+        super(0, 0, SIZE, SIZE, Component.empty(), b -> {
+        }, DEFAULT_NARRATION);
         this.parentScreen = parentScreen;
         this.sortRegion = sortRegion;
     }
@@ -34,10 +35,13 @@ public class SortButton extends Button {
     public void onPress() {
         if (Screen.hasShiftDown()) {
             PacketDistributor.sendToServer(new CycleMethodPayload(true));
+            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
         } else if (Screen.hasControlDown()) {
             PacketDistributor.sendToServer(new CycleMethodPayload(false));
+            SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
         } else {
             PacketDistributor.sendToServer(new SortRequestPayload(sortRegion));
+            SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
         }
     }
 

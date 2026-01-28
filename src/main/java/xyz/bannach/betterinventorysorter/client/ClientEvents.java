@@ -29,7 +29,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onScreenRender(ScreenEvent.Render.Post event) {
-        Component message = ClientPreferenceCache.getDisplayMessage();
+        Component message = SortFeedback.getDisplayMessage();
         if (message == null) {
             return;
         }

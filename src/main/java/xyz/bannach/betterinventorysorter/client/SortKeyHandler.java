@@ -34,11 +34,13 @@ public class SortKeyHandler {
         if (SORT_KEY.isActiveAndMatches(InputConstants.getKey(event.getKeyCode(), event.getScanCode()))) {
             if (Screen.hasShiftDown()) {
                 PacketDistributor.sendToServer(new CycleMethodPayload(true));
+                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
                 event.setCanceled(true);
                 return;
             }
             if (Screen.hasControlDown()) {
                 PacketDistributor.sendToServer(new CycleMethodPayload(false));
+                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
                 event.setCanceled(true);
                 return;
             }
@@ -54,11 +56,13 @@ public class SortKeyHandler {
         if (SORT_KEY.isActiveAndMatches(InputConstants.Type.MOUSE.getOrCreate(event.getButton()))) {
             if (Screen.hasShiftDown()) {
                 PacketDistributor.sendToServer(new CycleMethodPayload(true));
+                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
                 event.setCanceled(true);
                 return;
             }
             if (Screen.hasControlDown()) {
                 PacketDistributor.sendToServer(new CycleMethodPayload(false));
+                SortFeedback.showPreferenceChange(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
                 event.setCanceled(true);
                 return;
             }
@@ -75,6 +79,7 @@ public class SortKeyHandler {
 
         int region = determineRegion(hoveredSlot);
         PacketDistributor.sendToServer(new SortRequestPayload(region));
+        SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
     }
 
     private static int determineRegion(Slot slot) {
