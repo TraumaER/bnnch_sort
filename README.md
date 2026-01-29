@@ -1,4 +1,4 @@
-# Better Inventory Sorter
+# Bnnch: Sort
 
 A NeoForge mod for Minecraft 1.21.1 that provides intelligent inventory sorting with multiple sorting methods,
 customizable preferences, and an intuitive user interface.
@@ -26,7 +26,7 @@ customizable preferences, and an intuitive user interface.
 ## Installation
 
 1. Install [NeoForge](https://neoforged.net/) for Minecraft 1.21.1
-2. Download the latest release of Better Inventory Sorter
+2. Download the latest release of Bnnch: Sort
 3. Place the `.jar` file in your `mods` folder
 4. Launch Minecraft
 
@@ -76,7 +76,7 @@ The button can be disabled in the client configuration.
 
 ### Client Configuration
 
-Located at `config/betterinventorysorter-client.toml`
+Located at `config/bnnch_sort-client.toml`
 
 | Option           | Default | Description                                  |
 |------------------|---------|----------------------------------------------|
@@ -84,7 +84,7 @@ Located at `config/betterinventorysorter-client.toml`
 
 ### Server Configuration
 
-Located at `config/betterinventorysorter-server.toml`
+Located at `config/bnnch_sort-server.toml`
 
 | Option              | Default        | Description                            |
 |---------------------|----------------|----------------------------------------|
@@ -128,8 +128,8 @@ The following slot types are never sorted:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/betterinventorysorter.git
-cd betterinventorysorter
+git clone https://github.com/yourusername/bnnch_sort.git
+cd bnnch_sort
 
 # Build the mod
 ./gradlew.bat build
@@ -152,8 +152,8 @@ The compiled `.jar` file will be in `build/libs/`.
 ## Project Structure
 
 ```
-src/main/java/xyz/bannach/betterinventorysorter/
-├── Betterinventorysorter.java   # Mod entrypoint
+src/main/java/xyz/bannach/bnnch_sort/
+├── BnnchSort.java   # Mod entrypoint
 ├── Config.java                  # Configuration management
 ├── ModAttachments.java          # Player preference persistence
 ├── sorting/                     # Core sorting logic

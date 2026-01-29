@@ -1,6 +1,6 @@
-# Contributing to Better Inventory Sorter
+# Contributing to Bnnch: Sort
 
-Thank you for your interest in contributing to Better Inventory Sorter! This document provides guidelines and
+Thank you for your interest in contributing to Bnnch: Sort! This document provides guidelines and
 instructions for contributing to the project.
 
 ## Prerequisites
@@ -17,8 +17,8 @@ Before contributing, ensure you have:
 ### 1. Fork and Clone
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/betterinventorysorter.git
-cd betterinventorysorter
+git clone https://github.com/YOUR_USERNAME/bnnch_sort.git
+cd bnnch_sort
 ```
 
 ### 2. Build the Project
@@ -47,8 +47,8 @@ For IntelliJ IDEA:
 ```
 src/
 ├── main/
-│   ├── java/xyz/bannach/betterinventorysorter/
-│   │   ├── Betterinventorysorter.java    # Mod entrypoint (@Mod annotation)
+│   ├── java/xyz/bannach/bnnch_sort/
+│   │   ├── BnnchSort.java    # Mod entrypoint (@Mod annotation)
 │   │   ├── Config.java                   # Configuration (ModConfigSpec)
 │   │   ├── ModAttachments.java           # Data attachments for persistence
 │   │   ├── sorting/                      # Core sorting logic
@@ -57,7 +57,7 @@ src/
 │   │   ├── network/                      # Network packets
 │   │   ├── commands/                     # Brigadier slash commands
 │   │   └── test/                         # NeoForge GameTests
-│   ├── resources/assets/betterinventorysorter/
+│   ├── resources/assets/bnnch_sort/
 │   │   ├── lang/                         # Translation files
 │   │   └── textures/                     # Textures and icons
 │   └── templates/META-INF/
@@ -70,10 +70,10 @@ src/
 
 ### Mod ID Alignment
 
-The mod ID `betterinventorysorter` must remain consistent across:
+The mod ID `bnnch_sort` must remain consistent across:
 
 - `gradle.properties` (`mod_id` property)
-- `@Mod` annotation in `Betterinventorysorter.java`
+- `@Mod` annotation in `BnnchSort.java`
 - `neoforge.mods.toml` template
 
 ### Registration Pattern
@@ -175,13 +175,13 @@ Tests use the NeoForge GameTest framework (not JUnit):
 ./gradlew.bat runGameTestServer
 ```
 
-Test files are located in `src/main/java/xyz/bannach/betterinventorysorter/test/`.
+Test files are located in `src/main/java/xyz/bannach/bnnch_sort/test/`.
 
 ### Writing Tests
 
 ```java
 
-@GameTestHolder("betterinventorysorter")
+@GameTestHolder("bnnch_sort")
 @PrefixGameTestTemplate(false)
 public class MyGameTests {
 
@@ -209,7 +209,7 @@ This regenerates files in `src/generated/resources/`. Commit the regenerated fil
 
 1. Add the method to `SortMethod` enum in `sorting/`
 2. Implement the comparator logic in `ItemSorter`
-3. Add translations in `assets/betterinventorysorter/lang/`
+3. Add translations in `assets/bnnch_sort/lang/`
 4. Update configuration if needed
 5. Add GameTests for the new method
 
