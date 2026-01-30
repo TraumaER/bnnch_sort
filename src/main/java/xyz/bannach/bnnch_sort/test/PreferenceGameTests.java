@@ -1,5 +1,7 @@
 package xyz.bannach.bnnch_sort.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -19,9 +21,6 @@ import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Game tests for the player preference system.
  *
@@ -39,9 +38,9 @@ import java.util.List;
  * <h2>Running Tests</h2>
  * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
  *
- * @since 1.0.0
  * @see SortPreference
  * @see ModAttachments
+ * @since 1.0.0
  */
 @GameTestHolder("bnnch_sort")
 @PrefixGameTestTemplate(false)
@@ -50,10 +49,12 @@ public class PreferenceGameTests {
     /**
      * Private constructor to prevent instantiation of this test class.
      */
-    private PreferenceGameTests() {}
+    private PreferenceGameTests() {
+    }
 
     /**
      * Tests that default preference attachment is set correctly.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -69,6 +70,7 @@ public class PreferenceGameTests {
 
     /**
      * Tests that preferences persist when set on a player.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -89,6 +91,7 @@ public class PreferenceGameTests {
 
     /**
      * Tests that sorting uses the player's preference settings.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -97,7 +100,7 @@ public class PreferenceGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Items with different quantities
         chest.setItem(0, new ItemStack(Items.APPLE, 10));
@@ -142,6 +145,7 @@ public class PreferenceGameTests {
 
     /**
      * Tests that cycling method advances through all options.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -170,6 +174,7 @@ public class PreferenceGameTests {
 
     /**
      * Tests that toggling order flips between ascending and descending.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")

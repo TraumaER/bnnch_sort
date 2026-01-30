@@ -1,11 +1,10 @@
 package xyz.bannach.bnnch_sort;
 
+import java.util.function.Supplier;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
-
-import java.util.function.Supplier;
 
 /**
  * Registry for player data attachments used by the mod.
@@ -22,16 +21,17 @@ import java.util.function.Supplier;
  * <h2>Side: Common</h2>
  * <p>Attachments are registered on both sides but primarily used server-side for persistence.</p>
  *
- * @since 1.0.0
  * @see SortPreference
  * @see BnnchSort
+ * @since 1.0.0
  */
 public class ModAttachments {
 
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
-    private ModAttachments() {}
+    private ModAttachments() {
+    }
 
     /**
      * Deferred register for attachment types.

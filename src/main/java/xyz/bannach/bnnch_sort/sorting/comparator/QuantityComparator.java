@@ -1,8 +1,7 @@
 package xyz.bannach.bnnch_sort.sorting.comparator;
 
-import net.minecraft.world.item.ItemStack;
-
 import java.util.Comparator;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Comparator that sorts item stacks by their quantity (stack count).
@@ -28,9 +27,9 @@ import java.util.Comparator;
  * <h2>Side: Common</h2>
  * <p>Can be used on both client and server.</p>
  *
- * @since 1.0.0
  * @see xyz.bannach.bnnch_sort.sorting.SortMethod#QUANTITY
  * @see xyz.bannach.bnnch_sort.sorting.ItemSorter
+ * @since 1.0.0
  */
 public class QuantityComparator implements Comparator<ItemStack> {
 
@@ -43,7 +42,8 @@ public class QuantityComparator implements Comparator<ItemStack> {
      * Private constructor to enforce singleton pattern.
      * Use {@link #INSTANCE} to access this comparator.
      */
-    private QuantityComparator() {}
+    private QuantityComparator() {
+    }
 
     /**
      * Compares two item stacks by their quantity.
@@ -54,7 +54,7 @@ public class QuantityComparator implements Comparator<ItemStack> {
      * @param a the first item stack to compare
      * @param b the second item stack to compare
      * @return a negative integer, zero, or a positive integer if the first item
-     *         should sort before, equal to, or after the second
+     * should sort before, equal to, or after the second
      */
     @Override
     public int compare(ItemStack a, ItemStack b) {

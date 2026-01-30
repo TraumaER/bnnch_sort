@@ -1,9 +1,10 @@
 package xyz.bannach.bnnch_sort.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.CraftingMenu;
@@ -19,9 +20,6 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import xyz.bannach.bnnch_sort.server.SortHandler;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Game tests for edge cases and special scenarios.
@@ -41,9 +39,9 @@ import java.util.List;
  * <h2>Running Tests</h2>
  * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
  *
- * @since 1.0.0
  * @see ItemSorter
  * @see SortHandler
+ * @since 1.0.0
  */
 @GameTestHolder("bnnch_sort")
 @PrefixGameTestTemplate(false)
@@ -52,10 +50,12 @@ public class EdgeCaseGameTests {
     /**
      * Private constructor to prevent instantiation of this test class.
      */
-    private EdgeCaseGameTests() {}
+    private EdgeCaseGameTests() {
+    }
 
     /**
      * Tests sorting an empty container.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -78,6 +78,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests sorting a single item among empty slots.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -103,6 +104,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests that full stacks are not merged with other items.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -131,6 +133,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests that many partial stacks condense to multiple full stacks.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -158,6 +161,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests sorting many identical items doesn't crash.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -190,6 +194,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests that hotbar is unchanged when sorting main inventory.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -198,7 +203,7 @@ public class EdgeCaseGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Place items in hotbar (slots 0-8)
         player.getInventory().setItem(0, new ItemStack(Items.DIAMOND_SWORD));
@@ -238,6 +243,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests spectator mode detection for guarding sort requests.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -251,6 +257,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests detection of closed container state.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -265,7 +272,7 @@ public class EdgeCaseGameTests {
         // Verify that REGION_CONTAINER on a real chest menu returns non-empty
         BlockPos chestPos = new BlockPos(1, 1, 1);
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
@@ -277,6 +284,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests that crafting table slots are rejected for sorting.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -293,6 +301,7 @@ public class EdgeCaseGameTests {
 
     /**
      * Tests that furnace slots are rejected for sorting.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")

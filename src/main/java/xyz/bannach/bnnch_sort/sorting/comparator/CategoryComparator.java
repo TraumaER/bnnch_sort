@@ -1,10 +1,9 @@
 package xyz.bannach.bnnch_sort.sorting.comparator;
 
+import java.util.Comparator;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Comparator;
 
 /**
  * Comparator that sorts item stacks by their creative mode tab category.
@@ -29,9 +28,9 @@ import java.util.Comparator;
  * <h2>Side: Common</h2>
  * <p>Can be used on both client and server.</p>
  *
- * @since 1.0.0
  * @see xyz.bannach.bnnch_sort.sorting.SortMethod#CATEGORY
  * @see xyz.bannach.bnnch_sort.sorting.ItemSorter
+ * @since 1.0.0
  */
 public class CategoryComparator implements Comparator<ItemStack> {
 
@@ -49,7 +48,8 @@ public class CategoryComparator implements Comparator<ItemStack> {
      * Private constructor to enforce singleton pattern.
      * Use {@link #INSTANCE} to access this comparator.
      */
-    private CategoryComparator() {}
+    private CategoryComparator() {
+    }
 
     /**
      * Compares two item stacks by their creative tab category.
@@ -60,7 +60,7 @@ public class CategoryComparator implements Comparator<ItemStack> {
      * @param a the first item stack to compare
      * @param b the second item stack to compare
      * @return a negative integer, zero, or a positive integer if the first item
-     *         should sort before, equal to, or after the second
+     * should sort before, equal to, or after the second
      */
     @Override
     public int compare(ItemStack a, ItemStack b) {
