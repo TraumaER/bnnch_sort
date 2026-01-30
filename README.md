@@ -47,22 +47,22 @@ The sort key automatically detects which inventory section to sort based on mous
 
 ### Commands
 
-All commands use the `/bis` prefix:
+All commands use the `/bnnchsort` prefix:
 
 ```
-/bis sortinv [region]    - Sort your inventory
+/bnnchsort sortinv [region]    - Sort your inventory
                            Regions: all, main, hotbar (default: main)
 
-/bis change <method> <order>  - Set your sorting preference
+/bnnchsort change <method> <order>  - Set your sorting preference
                                 Methods: alphabetical, category, quantity, mod_id
                                 Orders: ascending, descending
 
-/bis reset               - Reset preferences to server defaults
+/bnnchsort reset               - Reset preferences to server defaults
 
-/bis config [key]        - View configuration settings
+/bnnchsort config [key]        - View configuration settings
                            Keys: method, order, button
 
-/bis help                - Display help and current preferences
+/bnnchsort help                - Display help and current preferences
 ```
 
 ### UI Button

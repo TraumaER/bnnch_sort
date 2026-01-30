@@ -32,18 +32,18 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Registers and handles the /bis command tree.
+ * Registers and handles the /bnnchsort command tree.
  *
  * <p>This class provides Brigadier slash commands for inventory sorting operations.
- * All commands are registered under the {@code /bis} prefix (Bnnch: Sort).</p>
+ * All commands are registered under the {@code /bnnchsort} prefix (Bnnch: Sort).</p>
  *
  * <h2>Available Commands</h2>
  * <ul>
- *   <li>{@code /bis sortinv [region]} - Sort player inventory (all, main, or hotbar)</li>
- *   <li>{@code /bis change <method> <order>} - Change sort preferences</li>
- *   <li>{@code /bis reset} - Reset preferences to server defaults</li>
- *   <li>{@code /bis config [key]} - View configuration values</li>
- *   <li>{@code /bis help} - Display help information</li>
+ *   <li>{@code /bnnchsort sortinv [region]} - Sort player inventory (all, main, or hotbar)</li>
+ *   <li>{@code /bnnchsort change <method> <order>} - Change sort preferences</li>
+ *   <li>{@code /bnnchsort reset} - Reset preferences to server defaults</li>
+ *   <li>{@code /bnnchsort config [key]} - View configuration values</li>
+ *   <li>{@code /bnnchsort help} - Display help information</li>
  * </ul>
  *
  * <h2>Side: Common</h2>
@@ -92,7 +92,7 @@ public class ModCommands {
     /**
      * Registers all mod commands during the command registration event.
      *
-     * <p>This method builds and registers the complete {@code /bis} command tree
+     * <p>This method builds and registers the complete {@code /bnnchsort} command tree
      * with all subcommands and their argument handlers.</p>
      *
      * @param event the command registration event
@@ -101,7 +101,7 @@ public class ModCommands {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
-        dispatcher.register(Commands.literal("bis")
+        dispatcher.register(Commands.literal("bnnchsort")
                 .then(Commands.literal("sortinv")
                         .executes(context -> executeSortInv(context, "main"))
                         .then(Commands.argument("region", StringArgumentType.word())
@@ -125,7 +125,7 @@ public class ModCommands {
     }
 
     /**
-     * Executes the /bis sortinv command to sort player inventory.
+     * Executes the /bnnchsort sortinv command to sort player inventory.
      *
      * <p>Sorts the specified region of the player's inventory using their current
      * sort preferences. Valid regions are "all", "main", and "hotbar".</p>
@@ -208,7 +208,7 @@ public class ModCommands {
     }
 
     /**
-     * Executes the /bis help command to display usage information.
+     * Executes the /bnnchsort help command to display usage information.
      *
      * <p>Shows all available commands and the player's current sort preferences.</p>
      *
@@ -236,7 +236,7 @@ public class ModCommands {
     }
 
     /**
-     * Executes the /bis change command to update sort preferences.
+     * Executes the /bnnchsort change command to update sort preferences.
      *
      * <p>Sets the player's sort method and order to the specified values and
      * syncs the change to the client.</p>
@@ -281,7 +281,7 @@ public class ModCommands {
     }
 
     /**
-     * Executes the /bis reset command to restore default preferences.
+     * Executes the /bnnchsort reset command to restore default preferences.
      *
      * <p>Resets the player's sort preferences to the server-configured defaults
      * and syncs the change to the client.</p>
@@ -311,7 +311,7 @@ public class ModCommands {
     }
 
     /**
-     * Executes the /bis config command to display configuration values.
+     * Executes the /bnnchsort config command to display configuration values.
      *
      * <p>Shows all config values if no key is specified, or a specific value
      * if a key (method, order, or button) is provided.</p>

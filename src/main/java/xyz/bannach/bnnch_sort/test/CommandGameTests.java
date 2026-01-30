@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Game tests for the /bis command functionality.
+ * Game tests for the /bnnchsort command functionality.
  *
  * <p>This class contains NeoForge GameTest framework tests that verify the
  * command system works correctly. Tests simulate command execution by directly
@@ -174,7 +174,7 @@ public class CommandGameTests {
         SortPreference initial = player.getData(ModAttachments.SORT_PREFERENCE);
         helper.assertTrue(initial.method() == Config.defaultSortMethod, "Initial method should be default");
 
-        // Simulate /bis change quantity descending
+        // Simulate /bnnchsort change quantity descending
         SortPreference newPref = new SortPreference(SortMethod.QUANTITY, SortOrder.DESCENDING);
         player.setData(ModAttachments.SORT_PREFERENCE, newPref);
 
@@ -203,7 +203,7 @@ public class CommandGameTests {
         // First change the preference
         player.setData(ModAttachments.SORT_PREFERENCE, new SortPreference(SortMethod.QUANTITY, SortOrder.DESCENDING));
 
-        // Simulate /bis reset - reset to config defaults
+        // Simulate /bnnchsort reset - reset to config defaults
         SortPreference defaultPref = new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder);
         player.setData(ModAttachments.SORT_PREFERENCE, defaultPref);
 
@@ -297,7 +297,7 @@ public class CommandGameTests {
     /**
      * Helper method to sort a player's inventory region.
      *
-     * <p>This method simulates what the /bis sortinv command does: extracts items
+     * <p>This method simulates what the /bnnchsort sortinv command does: extracts items
      * from the target slots, sorts them, and writes them back.</p>
      *
      * @param player the player whose inventory to sort

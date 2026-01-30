@@ -1,16 +1,16 @@
 /**
  * Brigadier slash commands for the Bnnch: Sort mod.
  *
- * <p>This package provides the {@code /bis} command tree for controlling inventory sorting
+ * <p>This package provides the {@code /bnnchsort} command tree for controlling inventory sorting
  * through chat commands. Commands are registered using NeoForge's command registration event.</p>
  *
  * <h2>Available Commands</h2>
  * <ul>
- *   <li>{@code /bis sortinv [region]} - Sort player inventory (regions: all, main, hotbar)</li>
- *   <li>{@code /bis change <method> <order>} - Change sort preferences</li>
- *   <li>{@code /bis reset} - Reset preferences to server defaults</li>
- *   <li>{@code /bis config [key]} - View current configuration values</li>
- *   <li>{@code /bis help} - Display help information</li>
+ *   <li>{@code /bnnchsort sortinv [region]} - Sort player inventory (regions: all, main, hotbar)</li>
+ *   <li>{@code /bnnchsort change <method> <order>} - Change sort preferences</li>
+ *   <li>{@code /bnnchsort reset} - Reset preferences to server defaults</li>
+ *   <li>{@code /bnnchsort config [key]} - View current configuration values</li>
+ *   <li>{@code /bnnchsort help} - Display help information</li>
  * </ul>
  *
  * <h2>Sort Methods</h2>
