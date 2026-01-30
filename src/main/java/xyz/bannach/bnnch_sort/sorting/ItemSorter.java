@@ -1,15 +1,14 @@
 package xyz.bannach.bnnch_sort.sorting;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import net.minecraft.world.item.ItemStack;
 import xyz.bannach.bnnch_sort.sorting.comparator.AlphabeticalComparator;
 import xyz.bannach.bnnch_sort.sorting.comparator.CategoryComparator;
 import xyz.bannach.bnnch_sort.sorting.comparator.ModIdComparator;
 import xyz.bannach.bnnch_sort.sorting.comparator.QuantityComparator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Core utility class for sorting inventory item stacks.
@@ -31,16 +30,17 @@ import java.util.List;
  * <p>This class is used primarily server-side for actual sorting, but the logic
  * is available on both sides.</p>
  *
- * @since 1.0.0
  * @see SortPreference
  * @see xyz.bannach.bnnch_sort.sorting.comparator
+ * @since 1.0.0
  */
 public final class ItemSorter {
 
     /**
      * Private constructor to prevent instantiation.
      */
-    private ItemSorter() {}
+    private ItemSorter() {
+    }
 
     /**
      * Sorts a list of item stacks according to the given preferences.
@@ -54,7 +54,7 @@ public final class ItemSorter {
      *   <li>Pads with empty stacks to match original size</li>
      * </ol>
      *
-     * @param stacks the list of item stacks to sort (not modified)
+     * @param stacks     the list of item stacks to sort (not modified)
      * @param preference the sorting preferences containing method and order
      * @return a new list containing the sorted stacks with preserved slot count
      */

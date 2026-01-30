@@ -4,6 +4,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -26,11 +30,6 @@ import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
 /**
  * Registers and handles the /bnnchsort command tree.
  *
@@ -49,10 +48,10 @@ import java.util.stream.Stream;
  * <h2>Side: Common</h2>
  * <p>Commands are registered on both sides but execute server-side.</p>
  *
- * @since 1.0.0
  * @see SortHandler
  * @see ItemSorter
  * @see SortPreference
+ * @since 1.0.0
  */
 @EventBusSubscriber(modid = BnnchSort.MODID)
 public class ModCommands {
@@ -60,7 +59,8 @@ public class ModCommands {
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
-    private ModCommands() {}
+    private ModCommands() {
+    }
 
     /**
      * Suggestion provider for inventory region arguments.
@@ -131,7 +131,7 @@ public class ModCommands {
      * sort preferences. Valid regions are "all", "main", and "hotbar".</p>
      *
      * @param context the command context containing the source
-     * @param region the inventory region to sort
+     * @param region  the inventory region to sort
      * @return 1 on success, 0 on failure
      */
     private static int executeSortInv(CommandContext<CommandSourceStack> context, String region) {
@@ -185,8 +185,8 @@ public class ModCommands {
      * <p>Extracts items from the target slots, sorts them, and writes them back.
      * This is a helper method used by {@link #executeSortInv}.</p>
      *
-     * @param menu the container menu to sort within
-     * @param region the region code to sort
+     * @param menu       the container menu to sort within
+     * @param region     the region code to sort
      * @param preference the sort preferences to apply
      */
     private static void sortRegion(AbstractContainerMenu menu, int region, SortPreference preference) {
@@ -317,7 +317,7 @@ public class ModCommands {
      * if a key (method, order, or button) is provided.</p>
      *
      * @param context the command context containing the source
-     * @param key the config key to display, or null for all keys
+     * @param key     the config key to display, or null for all keys
      * @return 1 on success, 0 on failure (invalid key)
      */
     private static int executeConfig(CommandContext<CommandSourceStack> context, String key) {

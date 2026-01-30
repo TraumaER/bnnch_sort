@@ -1,5 +1,7 @@
 package xyz.bannach.bnnch_sort.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -18,9 +20,6 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import xyz.bannach.bnnch_sort.server.SortHandler;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Game tests for edge cases and special scenarios.

@@ -1,8 +1,7 @@
 package xyz.bannach.bnnch_sort.sorting.comparator;
 
-import net.minecraft.world.item.ItemStack;
-
 import java.util.Comparator;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Comparator that sorts item stacks alphabetically by their display name.
@@ -19,9 +18,9 @@ import java.util.Comparator;
  * <h2>Side: Common</h2>
  * <p>Can be used on both client and server.</p>
  *
- * @since 1.0.0
  * @see xyz.bannach.bnnch_sort.sorting.SortMethod#ALPHABETICAL
  * @see xyz.bannach.bnnch_sort.sorting.ItemSorter
+ * @since 1.0.0
  */
 public class AlphabeticalComparator implements Comparator<ItemStack> {
 
@@ -34,7 +33,8 @@ public class AlphabeticalComparator implements Comparator<ItemStack> {
      * Private constructor to enforce singleton pattern.
      * Use {@link #INSTANCE} to access this comparator.
      */
-    private AlphabeticalComparator() {}
+    private AlphabeticalComparator() {
+    }
 
     /**
      * Compares two item stacks by their display names.
@@ -45,7 +45,7 @@ public class AlphabeticalComparator implements Comparator<ItemStack> {
      * @param a the first item stack to compare
      * @param b the second item stack to compare
      * @return a negative integer, zero, or a positive integer if the first item's
-     *         name is alphabetically less than, equal to, or greater than the second
+     * name is alphabetically less than, equal to, or greater than the second
      */
     @Override
     public int compare(ItemStack a, ItemStack b) {

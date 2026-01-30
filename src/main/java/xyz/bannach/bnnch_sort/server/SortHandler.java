@@ -1,6 +1,11 @@
 package xyz.bannach.bnnch_sort.server;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -10,13 +15,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
-
-import net.minecraft.world.Container;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Server-side handler for sort request payloads.
@@ -43,16 +41,17 @@ import java.util.Set;
  * <h2>Side: Server-only</h2>
  * <p>All sorting operations execute on the server to prevent cheating.</p>
  *
- * @since 1.0.0
  * @see SortRequestPayload
  * @see ItemSorter
+ * @since 1.0.0
  */
 public class SortHandler {
 
     /**
      * Private constructor to prevent instantiation of this utility class.
      */
-    private SortHandler() {}
+    private SortHandler() {
+    }
 
     /**
      * Region code for the container's inventory (chest, shulker box, etc.).
@@ -133,7 +132,7 @@ public class SortHandler {
      *   <li>Armor and offhand slots (outside slots 0-35)</li>
      * </ul>
      *
-     * @param menu the container menu to analyze
+     * @param menu   the container menu to analyze
      * @param region the region code ({@link #REGION_CONTAINER}, {@link #REGION_PLAYER_MAIN}, or {@link #REGION_PLAYER_HOTBAR})
      * @return a list of sortable slots for the specified region, may be empty
      */
@@ -158,8 +157,10 @@ public class SortHandler {
                         && slot.getClass() == Slot.class
                         && !(slot.container instanceof CraftingContainer)
                         && !specialContainers.contains(slot.container);
-                case REGION_PLAYER_MAIN -> slot.container instanceof Inventory && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35;
-                case REGION_PLAYER_HOTBAR -> slot.container instanceof Inventory && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8;
+                case REGION_PLAYER_MAIN ->
+                        slot.container instanceof Inventory && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35;
+                case REGION_PLAYER_HOTBAR ->
+                        slot.container instanceof Inventory && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8;
                 default -> false;
             };
 
