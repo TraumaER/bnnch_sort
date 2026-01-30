@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import xyz.bannach.bnnch_sort.BnnchSort;
 import xyz.bannach.bnnch_sort.server.PreferenceHandler;
 
@@ -48,7 +49,7 @@ public record CyclePreferencePayload() implements CustomPacketPayload {
      * @return the registered payload type
      */
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }

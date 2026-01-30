@@ -97,7 +97,7 @@ public class PreferenceGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Items with different quantities
         chest.setItem(0, new ItemStack(Items.APPLE, 10));

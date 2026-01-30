@@ -1,6 +1,7 @@
 package xyz.bannach.bnnch_sort.sorting;
 
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Enumeration of available sort directions.
@@ -54,7 +55,7 @@ public enum SortOrder implements StringRepresentable {
      * @return the string identifier for this sort order
      */
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return serializedName;
     }
 

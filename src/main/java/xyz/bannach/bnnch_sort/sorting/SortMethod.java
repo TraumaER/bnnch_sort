@@ -1,6 +1,7 @@
 package xyz.bannach.bnnch_sort.sorting;
 
 import net.minecraft.util.StringRepresentable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Enumeration of available sorting methods for inventory items.
@@ -72,7 +73,7 @@ public enum SortMethod implements StringRepresentable {
      * @return the string identifier for this sort method
      */
     @Override
-    public String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return serializedName;
     }
 

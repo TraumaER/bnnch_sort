@@ -34,7 +34,6 @@ public class BnnchSort {
 
     /**
      * The mod identifier used throughout the mod for registration and resource locations.
-     * Value: {@value #MODID}
      */
     public static final String MODID = "bnnch_sort";
 

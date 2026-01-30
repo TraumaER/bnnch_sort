@@ -189,10 +189,7 @@ public class SortKeyHandler {
             }
         }
         // Reject crafting grid slots
-        if (slot.container instanceof CraftingContainer) {
-            return false;
-        }
-        return true;
+        return !(slot.container instanceof CraftingContainer);
     }
 
     /**

@@ -41,9 +41,9 @@ import java.util.List;
  * <h2>Running Tests</h2>
  * <pre>{@code ./gradlew.bat runGameTestServer}</pre>
  *
- * @since 1.0.0
  * @see ItemSorter
  * @see SortHandler
+ * @since 1.0.0
  */
 @GameTestHolder("bnnch_sort")
 @PrefixGameTestTemplate(false)
@@ -52,10 +52,12 @@ public class SortingGameTests {
     /**
      * Private constructor to prevent instantiation of this test class.
      */
-    private SortingGameTests() {}
+    private SortingGameTests() {
+    }
 
     /**
      * Tests alphabetical sorting by item name.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -77,6 +79,7 @@ public class SortingGameTests {
 
     /**
      * Tests category sorting groups items by creative tab.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -101,6 +104,7 @@ public class SortingGameTests {
 
     /**
      * Tests quantity sorting orders by stack count.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -122,6 +126,7 @@ public class SortingGameTests {
 
     /**
      * Tests quantity sorting uses alphabetical tiebreaker.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -143,6 +148,7 @@ public class SortingGameTests {
 
     /**
      * Tests mod ID sorting groups items by namespace.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -166,6 +172,7 @@ public class SortingGameTests {
 
     /**
      * Tests that partial stacks are combined during merging.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -177,7 +184,7 @@ public class SortingGameTests {
         List<ItemStack> merged = ItemSorter.mergeStacks(stacks);
 
         helper.assertTrue(merged.size() == 1, "Expected 1 stack, got " + merged.size());
-        helper.assertTrue(merged.get(0).getCount() == 64, "Expected count 64, got " + merged.get(0).getCount());
+        helper.assertTrue(merged.getFirst().getCount() == 64, "Expected count 64, got " + merged.getFirst().getCount());
         assertItem(helper, merged, 0, Items.STONE);
 
         helper.succeed();
@@ -185,6 +192,7 @@ public class SortingGameTests {
 
     /**
      * Tests that overflow items create new stacks during merging.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -211,6 +219,7 @@ public class SortingGameTests {
 
     /**
      * Tests that unstackable items are not merged.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -228,6 +237,7 @@ public class SortingGameTests {
 
     /**
      * Tests that items with different components are not merged.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -251,6 +261,7 @@ public class SortingGameTests {
 
     /**
      * Tests that descending order reverses the sort result.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -272,6 +283,7 @@ public class SortingGameTests {
 
     /**
      * Tests that empty slots are moved to the end after sorting.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -298,6 +310,7 @@ public class SortingGameTests {
 
     /**
      * Tests the full pipeline: condense stacks, then sort.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -325,9 +338,9 @@ public class SortingGameTests {
     /**
      * Asserts that an item at the given index matches the expected item type.
      *
-     * @param helper the test helper for assertions
-     * @param stacks the list of item stacks to check
-     * @param index the index to check
+     * @param helper   the test helper for assertions
+     * @param stacks   the list of item stacks to check
+     * @param index    the index to check
      * @param expected the expected item type
      */
     private static void assertItem(GameTestHelper helper, List<ItemStack> stacks, int index, net.minecraft.world.item.Item expected) {
@@ -341,6 +354,7 @@ public class SortingGameTests {
 
     /**
      * Tests that chest slots are correctly partitioned.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -349,7 +363,7 @@ public class SortingGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Fill chest with items in reverse alphabetical order
         chest.setItem(0, new ItemStack(Items.STONE));
@@ -360,12 +374,7 @@ public class SortingGameTests {
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         // Get container slots using SortHandler logic
-        List<Slot> containerSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
-                containerSlots.add(slot);
-            }
-        }
+        List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
 
         helper.assertTrue(containerSlots.size() == 27, "Expected 27 chest slots, got " + containerSlots.size());
         helper.assertTrue(containerSlots.get(0).getItem().is(Items.STONE), "First slot should be stone");
@@ -377,6 +386,7 @@ public class SortingGameTests {
 
     /**
      * Tests that chest contents are sorted correctly.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -385,7 +395,7 @@ public class SortingGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Fill chest with items in reverse alphabetical order
         chest.setItem(0, new ItemStack(Items.STONE));
@@ -396,12 +406,7 @@ public class SortingGameTests {
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         // Simulate sort handler logic for REGION_CONTAINER
-        List<Slot> targetSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
-                targetSlots.add(slot);
-            }
-        }
+        List<Slot> targetSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
 
         // Extract and sort
         List<ItemStack> stacks = new ArrayList<>();
@@ -426,6 +431,7 @@ public class SortingGameTests {
 
     /**
      * Tests that player main inventory slots are correctly partitioned.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -434,19 +440,13 @@ public class SortingGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Open chest menu
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         // Count player main inventory slots (container slots 9-35)
-        List<Slot> mainSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            if (slot.container instanceof net.minecraft.world.entity.player.Inventory
-                && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35) {
-                mainSlots.add(slot);
-            }
-        }
+        List<Slot> mainSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_PLAYER_MAIN);
 
         helper.assertTrue(mainSlots.size() == 27, "Expected 27 main inventory slots, got " + mainSlots.size());
 
@@ -455,6 +455,7 @@ public class SortingGameTests {
 
     /**
      * Tests that player hotbar slots are correctly partitioned.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -463,19 +464,13 @@ public class SortingGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Open chest menu
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         // Count player hotbar slots (container slots 0-8)
-        List<Slot> hotbarSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            if (slot.container instanceof net.minecraft.world.entity.player.Inventory
-                && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8) {
-                hotbarSlots.add(slot);
-            }
-        }
+        List<Slot> hotbarSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_PLAYER_HOTBAR);
 
         helper.assertTrue(hotbarSlots.size() == 9, "Expected 9 hotbar slots, got " + hotbarSlots.size());
 
@@ -484,34 +479,22 @@ public class SortingGameTests {
 
     /**
      * Tests that invalid region codes return no slots.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
     public static void sort_handler_empty_region_returns_no_slots(GameTestHelper helper) {
+        int INVALID_REGION = 999;
+
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Open chest menu
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
-
-        // Test invalid region code (999)
-        List<Slot> invalidSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            boolean matches = switch (999) {
-                case SortHandler.REGION_CONTAINER -> !(slot.container instanceof net.minecraft.world.entity.player.Inventory);
-                case SortHandler.REGION_PLAYER_MAIN -> slot.container instanceof net.minecraft.world.entity.player.Inventory
-                    && slot.getContainerSlot() >= 9 && slot.getContainerSlot() <= 35;
-                case SortHandler.REGION_PLAYER_HOTBAR -> slot.container instanceof net.minecraft.world.entity.player.Inventory
-                    && slot.getContainerSlot() >= 0 && slot.getContainerSlot() <= 8;
-                default -> false;
-            };
-            if (matches) {
-                invalidSlots.add(slot);
-            }
-        }
+        List<Slot> invalidSlots = SortHandler.getTargetSlots(menu, INVALID_REGION);
 
         helper.assertTrue(invalidSlots.isEmpty(), "Invalid region should return no slots");
 
@@ -520,6 +503,7 @@ public class SortingGameTests {
 
     /**
      * Tests that sorting chest does not affect player inventory.
+     *
      * @param helper the game test helper
      */
     @GameTest(template = "empty")
@@ -528,7 +512,7 @@ public class SortingGameTests {
         BlockPos chestPos = new BlockPos(1, 1, 1);
 
         helper.setBlock(chestPos, Blocks.CHEST);
-        ChestBlockEntity chest = (ChestBlockEntity) helper.getBlockEntity(chestPos);
+        ChestBlockEntity chest = helper.getBlockEntity(chestPos);
 
         // Fill chest with items
         chest.setItem(0, new ItemStack(Items.STONE));
@@ -542,12 +526,7 @@ public class SortingGameTests {
         ChestMenu menu = ChestMenu.threeRows(0, player.getInventory(), chest);
 
         // Sort only chest (REGION_CONTAINER)
-        List<Slot> containerSlots = new ArrayList<>();
-        for (Slot slot : menu.slots) {
-            if (!(slot.container instanceof net.minecraft.world.entity.player.Inventory)) {
-                containerSlots.add(slot);
-            }
-        }
+        List<Slot> containerSlots = SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER);
 
         List<ItemStack> stacks = new ArrayList<>();
         for (Slot slot : containerSlots) {
