@@ -1,3 +1,5 @@
+![Bnnch Sort Banner](docs/images/bnnch_sort_banner.png)
+
 # Bnnch: Sort
 
 A NeoForge mod for Minecraft 1.21.1 that provides intelligent inventory sorting with multiple sorting methods,
