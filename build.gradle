@@ -5,7 +5,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.140'
 }
 
-version = "neoforge-${mod_version}+mc${minecraft_version}"
+version = "${mod_version}+mc${minecraft_version}"
 group = mod_group_id
 
 repositories {
@@ -13,7 +13,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = "${mod_id}-neoforge"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
