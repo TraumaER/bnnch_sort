@@ -114,15 +114,21 @@ public class MyClass {
 
 ## Git Workflow
 
+For full details on branching and releases, see [docs/BRANCHING_AND_RELEASE.md](docs/BRANCHING_AND_RELEASE.md).
+
 ### Branch Naming
 
-Create feature branches with the format:
+Create branches with these formats:
 
-```
-your-name/issue-number-brief-description
-```
+| Type    | Format               | Example                |
+| ------- | -------------------- | ---------------------- |
+| Feature | `feature/<name>`     | `feature/auto-sort`    |
+| Bug fix | `fix/<name>`         | `fix/crash-on-empty`   |
+| Release | `release/<version>`  | `release/1.2.0`        |
 
-Example: `johndoe/42-add-creative-tab`
+Base your branch on:
+- `main` for the latest Minecraft version
+- `mc/<version>` for older supported versions (e.g., `mc/1.21.1`)
 
 ### Commit Messages
 
@@ -153,7 +159,17 @@ chore: update NeoForge to 21.1.50
     - Brief summary of changes
     - Why the changes were made
     - Testing steps if applicable
-3. **Target branch:** `main`
+3. **Target branch:**
+    - `main` for the latest Minecraft version
+    - `mc/<version>` for backports to older supported versions
+
+### Backporting
+
+When a fix or feature applies to multiple Minecraft versions:
+
+1. Merge the PR to `main` first
+2. Cherry-pick the commit(s) to the target `mc/<version>` branch
+3. Open a separate PR for the backport
 
 ## Building and Testing
 

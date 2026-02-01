@@ -202,21 +202,23 @@ All packets use protocol version "1".
 
 ## Contributing
 
-Contributions are welcome! Please follow these guidelines:
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+### Quick Start
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feat/your-feature`)
+2. Create a branch from `main` (or `mc/*` for version-specific changes):
+   - `feature/<name>` for new features
+   - `fix/<name>` for bug fixes
 3. Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
 4. Submit a pull request with a clear description
 
-### Commit Format
+### Branching Strategy
 
-```
-feat: add new sorting algorithm
-fix: prevent crash on empty container
-docs: update installation instructions
-chore: update dependencies
-```
+See [docs/BRANCHING_AND_RELEASE.md](docs/BRANCHING_AND_RELEASE.md) for details on:
+- Branch structure and naming conventions
+- Multi-version support workflow
+- Release process
 
 ## License
 
