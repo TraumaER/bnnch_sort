@@ -210,10 +210,10 @@ DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 #     treated as '${Hostname}' itself on the command line.
 
 set -- \
-  "-Dorg.gradle.appname=$APP_BASE_NAME" \
-  -classpath "$CLASSPATH" \
-  org.gradle.wrapper.GradleWrapperMain \
-  "$@"
+"-Dorg.gradle.appname=$APP_BASE_NAME" \
+-classpath "$CLASSPATH" \
+org.gradle.wrapper.GradleWrapperMain \
+"$@"
 
 # Stop when "xargs" is not available.
 if ! command -v xargs >/dev/null 2>&1; then
