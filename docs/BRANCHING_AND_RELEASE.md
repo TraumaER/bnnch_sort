@@ -232,11 +232,13 @@ It performs:
 
 ### Release Automation
 
-The release workflow triggers on tags matching `v*+mc*` and:
+The release workflow triggers on tags starting with `v` and validates the format
+`v<major>.<minor>.<patch>+mc<mc-version>`. It then:
 
-1. Builds the mod JAR
-2. Extracts version information from the tag
-3. Creates a GitHub Release with the JAR attached
+1. Validates the tag format (fails fast if invalid)
+2. Builds the mod JAR
+3. Extracts version information from the tag
+4. Creates a GitHub Release with the JAR attached
 
 ### Future: Platform Publishing (Phase 3)
 
