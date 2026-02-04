@@ -120,13 +120,14 @@ For full details on branching and releases, see [docs/BRANCHING_AND_RELEASE.md](
 
 Create branches with these formats:
 
-| Type    | Format               | Example                |
-| ------- | -------------------- | ---------------------- |
-| Feature | `feature/<name>`     | `feature/auto-sort`    |
-| Bug fix | `fix/<name>`         | `fix/crash-on-empty`   |
-| Release | `release/<version>`  | `release/1.2.0`        |
+| Type    | Format              | Example              |
+|---------|---------------------|----------------------|
+| Feature | `feature/<name>`    | `feature/auto-sort`  |
+| Bug fix | `fix/<name>`        | `fix/crash-on-empty` |
+| Release | `release/<version>` | `release/1.2.0`      |
 
 Base your branch on:
+
 - `main` for the latest Minecraft version
 - `mc/<version>` for older supported versions (e.g., `mc/1.21.1`)
 

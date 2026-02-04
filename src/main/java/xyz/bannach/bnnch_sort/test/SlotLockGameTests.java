@@ -15,9 +15,9 @@ import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 /**
  * Game tests for the slot locking feature.
  *
- * <p>This class contains NeoForge GameTest framework tests that verify slot locking works correctly.
- * Tests cover the LockedSlots record, lock-aware sorting, pre-sort merging into locked slots, the
- * unlock command, and attachment persistence.
+ * <p>This class contains NeoForge GameTest framework tests that verify slot locking works
+ * correctly. Tests cover the LockedSlots record, lock-aware sorting, pre-sort merging into locked
+ * slots, the unlock command, and attachment persistence.
  *
  * <h2>Test Categories</h2>
  *
@@ -225,8 +225,7 @@ public class SlotLockGameTests {
 
     // Slot 9 should still be empty (locked)
     helper.assertTrue(
-        player.getInventory().getItem(9).isEmpty(),
-        "Locked empty slot 9 should remain empty");
+        player.getInventory().getItem(9).isEmpty(), "Locked empty slot 9 should remain empty");
 
     // Unlocked slots should be sorted
     helper.assertTrue(
@@ -299,8 +298,7 @@ public class SlotLockGameTests {
 
     // Locked slot 9 should have 48 stone (32 + 16 merged)
     helper.assertTrue(
-        player.getInventory().getItem(9).is(Items.STONE),
-        "Locked slot 9 should still be Stone");
+        player.getInventory().getItem(9).is(Items.STONE), "Locked slot 9 should still be Stone");
     helper.assertTrue(
         player.getInventory().getItem(9).getCount() == 48,
         "Locked slot 9 should have 48 stone, got " + player.getInventory().getItem(9).getCount());
@@ -334,12 +332,10 @@ public class SlotLockGameTests {
 
     // Unlocked stone should still exist
     helper.assertTrue(
-        player.getInventory().getItem(10).is(Items.STONE),
-        "Unlocked stone should be in slot 10");
+        player.getInventory().getItem(10).is(Items.STONE), "Unlocked stone should be in slot 10");
     helper.assertTrue(
         player.getInventory().getItem(10).getCount() == 16,
-        "Unlocked stone should have count 16, got "
-            + player.getInventory().getItem(10).getCount());
+        "Unlocked stone should have count 16, got " + player.getInventory().getItem(10).getCount());
 
     helper.succeed();
   }
@@ -368,8 +364,7 @@ public class SlotLockGameTests {
         player.getInventory().getItem(9).is(Items.DIAMOND_SWORD),
         "Locked slot 9 should still be Diamond Sword");
     helper.assertTrue(
-        player.getInventory().getItem(9).getCount() == 1,
-        "Locked sword should still have count 1");
+        player.getInventory().getItem(9).getCount() == 1, "Locked sword should still have count 1");
 
     helper.succeed();
   }
@@ -429,12 +424,10 @@ public class SlotLockGameTests {
     // No locks set (default EMPTY)
     SortHandler.sortRegion(player, player.inventoryMenu, SortHandler.REGION_PLAYER_MAIN);
 
-    helper.assertTrue(
-        player.getInventory().getItem(9).is(Items.APPLE), "Slot 9 should be Apple");
+    helper.assertTrue(player.getInventory().getItem(9).is(Items.APPLE), "Slot 9 should be Apple");
     helper.assertTrue(
         player.getInventory().getItem(10).is(Items.DIAMOND), "Slot 10 should be Diamond");
-    helper.assertTrue(
-        player.getInventory().getItem(11).is(Items.STONE), "Slot 11 should be Stone");
+    helper.assertTrue(player.getInventory().getItem(11).is(Items.STONE), "Slot 11 should be Stone");
 
     helper.succeed();
   }
@@ -493,11 +486,9 @@ public class SlotLockGameTests {
 
     // Hotbar should sort normally (no hotbar slots are locked)
     helper.assertTrue(
-        player.getInventory().getItem(0).is(Items.APPLE),
-        "Hotbar slot 0 should be Apple (sorted)");
+        player.getInventory().getItem(0).is(Items.APPLE), "Hotbar slot 0 should be Apple (sorted)");
     helper.assertTrue(
-        player.getInventory().getItem(1).is(Items.STONE),
-        "Hotbar slot 1 should be Stone (sorted)");
+        player.getInventory().getItem(1).is(Items.STONE), "Hotbar slot 1 should be Stone (sorted)");
 
     helper.succeed();
   }
@@ -523,8 +514,7 @@ public class SlotLockGameTests {
     player.setData(ModAttachments.LOCKED_SLOTS, LockedSlots.EMPTY);
 
     LockedSlots after = player.getData(ModAttachments.LOCKED_SLOTS);
-    helper.assertTrue(
-        after.slots().isEmpty(), "All slots should be unlocked after unlock command");
+    helper.assertTrue(after.slots().isEmpty(), "All slots should be unlocked after unlock command");
 
     helper.succeed();
   }
@@ -553,8 +543,7 @@ public class SlotLockGameTests {
 
     // Locked slots should be unchanged
     helper.assertTrue(
-        player.getInventory().getItem(9).is(Items.STONE),
-        "Locked slot 9 should still be Stone");
+        player.getInventory().getItem(9).is(Items.STONE), "Locked slot 9 should still be Stone");
     helper.assertTrue(
         player.getInventory().getItem(12).is(Items.GOLD_INGOT),
         "Locked slot 12 should still be Gold Ingot");
@@ -599,5 +588,4 @@ public class SlotLockGameTests {
 
     helper.succeed();
   }
-
 }

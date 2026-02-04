@@ -44,8 +44,7 @@ public class LockHandler {
           LockedSlots updated = current.toggle(slotIndex);
           player.setData(ModAttachments.LOCKED_SLOTS, updated);
 
-          PacketDistributor.sendToPlayer(
-              player, new SyncLockedSlotsPayload(updated.slots()));
+          PacketDistributor.sendToPlayer(player, new SyncLockedSlotsPayload(updated.slots()));
         });
   }
 }

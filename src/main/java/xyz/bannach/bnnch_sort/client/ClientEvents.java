@@ -115,8 +115,7 @@ public class ClientEvents {
     if (!ClientLockedSlotsCache.isLocked(containerSlot)) {
       return;
     }
-    Component modifierName =
-        Component.translatable(Config.lockModifierKey.getTranslationKey());
+    Component modifierName = Component.translatable(Config.lockModifierKey.getTranslationKey());
     event.getToolTip().add(Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName));
   }
 
@@ -133,8 +132,7 @@ public class ClientEvents {
     if (event.getScreen() instanceof AbstractContainerScreen<?> screen) {
       GuiGraphics guiGraphics = event.getGuiGraphics();
       SlotLockRenderer.renderLockOverlays(screen, guiGraphics);
-      SlotLockRenderer.renderLockTooltip(
-          screen, guiGraphics, event.getMouseX(), event.getMouseY());
+      SlotLockRenderer.renderLockTooltip(screen, guiGraphics, event.getMouseX(), event.getMouseY());
     }
 
     Component message = SortFeedback.getDisplayMessage();

@@ -64,7 +64,8 @@ public class Config {
   /** Config value for the tint color applied to locked slots (hex ARGB). */
   private static final ModConfigSpec.ConfigValue<String> LOCK_TINT_COLOR =
       CLIENT_BUILDER
-          .comment("Tint color for locked slots in hex ARGB format (e.g. 800000FF for semi-transparent blue)")
+          .comment(
+              "Tint color for locked slots in hex ARGB format (e.g. 800000FF for semi-transparent blue)")
           .define(
               "lockTintColor",
               "800000FF",

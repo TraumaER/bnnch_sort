@@ -35,9 +35,7 @@ public record SyncLockedSlotsPayload(Set<Integer> lockedSlots) implements Custom
   /** Codec for encoding and decoding this payload to/from a byte buffer. */
   public static final StreamCodec<ByteBuf, SyncLockedSlotsPayload> STREAM_CODEC =
       StreamCodec.composite(
-          INT_SET_CODEC,
-          SyncLockedSlotsPayload::lockedSlots,
-          SyncLockedSlotsPayload::new);
+          INT_SET_CODEC, SyncLockedSlotsPayload::lockedSlots, SyncLockedSlotsPayload::new);
 
   @Override
   public @NotNull Type<? extends CustomPacketPayload> type() {

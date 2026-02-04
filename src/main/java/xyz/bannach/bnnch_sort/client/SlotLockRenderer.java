@@ -83,10 +83,8 @@ public class SlotLockRenderer {
       return;
     }
 
-    Component modifierName =
-        Component.translatable(Config.lockModifierKey.getTranslationKey());
-    Component tooltip =
-        Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName);
+    Component modifierName = Component.translatable(Config.lockModifierKey.getTranslationKey());
+    Component tooltip = Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName);
     guiGraphics.renderTooltip(
         screen.getMinecraft().font, List.of(tooltip), java.util.Optional.empty(), mouseX, mouseY);
   }

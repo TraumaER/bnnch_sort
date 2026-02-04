@@ -214,8 +214,7 @@ public class ModCommands {
     if (locked.slots().isEmpty()) {
       context
           .getSource()
-          .sendSuccess(
-              () -> Component.translatable("command.bnnch_sort.unlock.none"), false);
+          .sendSuccess(() -> Component.translatable("command.bnnch_sort.unlock.none"), false);
       return 1;
     }
 
