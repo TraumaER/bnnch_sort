@@ -121,3 +121,5 @@ runs/
 .claude/*.local.*
 CLAUDE.local.md
 AGENTS.local.md
+
+.reviews/

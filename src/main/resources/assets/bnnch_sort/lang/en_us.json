@@ -28,5 +28,13 @@
   "command.bnnch_sort.config.header": "Bnnch: Sort Configuration:",
   "command.bnnch_sort.config.method": "Default Sort Method: %s",
   "command.bnnch_sort.config.order": "Default Sort Order: %s",
-  "command.bnnch_sort.config.button": "Show Sort Button: %s"
+  "command.bnnch_sort.config.button": "Show Sort Button: %s",
+  "modifier_key.bnnch_sort.alt": "Alt",
+  "modifier_key.bnnch_sort.control": "Ctrl",
+  "modifier_key.bnnch_sort.shift": "Shift",
+  "tooltip.bnnch_sort.slot_locked": "Locked — hold %s + click to unlock",
+  "command.bnnch_sort.unlock.success": "Unlocked %s slot(s)",
+  "command.bnnch_sort.unlock.none": "No slots are locked",
+  "command.bnnch_sort.help.unlock": "/bnnchsort unlock - Unlock all locked slots",
+  "command.bnnch_sort.help.locked": "Locked slots: %s (main), %s (hotbar)"
 }

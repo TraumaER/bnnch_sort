@@ -7,7 +7,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import xyz.bannach.bnnch_sort.BnnchSort;
 import xyz.bannach.bnnch_sort.ModAttachments;
+import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
+import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 /**
@@ -51,6 +53,9 @@ public class ServerEvents {
       SortPreference pref = player.getData(ModAttachments.SORT_PREFERENCE);
       PacketDistributor.sendToPlayer(
           player, new SyncPreferencePayload(pref.method(), pref.order()));
+
+      LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
+      PacketDistributor.sendToPlayer(player, new SyncLockedSlotsPayload(locked.slots()));
     }
   }
 }
