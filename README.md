@@ -103,7 +103,7 @@ Located at `config/bnnch_sort-client.toml`
 |-------------------|------------|------------------------------------------------------------|
 | `showSortButton`  | `true`     | Display the sort button on container screens               |
 | `lockModifierKey` | `ALT`      | Modifier key for locking slots (`ALT`, `CONTROL`, `SHIFT`) |
-| `lockTintColor`   | `0000FF80` | RGBA hex color for the locked slot overlay tint            |
+| `lockTintColor`   | `FFD70080` | RGBA hex color for the locked slot overlay tint            |
 | `showLockTooltip` | `true`     | Show unlock hint tooltip on locked slots                   |
 
 #### Lock Tint Color

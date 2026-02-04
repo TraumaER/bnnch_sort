@@ -65,10 +65,10 @@ public class Config {
   private static final ModConfigSpec.ConfigValue<String> LOCK_TINT_COLOR =
       CLIENT_BUILDER
           .comment(
-              "Tint color for locked slots in hex RGBA format (e.g. 0000FF80 for semi-transparent blue)")
+              "Tint color for locked slots in hex RGBA format (e.g. FFD70080 for semi-transparent gold)")
           .define(
               "lockTintColor",
-              "0000FF80",
+              "FFD70080",
               s -> {
                 try {
                   Long.parseLong((String) s, 16);
@@ -190,7 +190,7 @@ public class Config {
     if (spec == CLIENT_SPEC) {
       showSortButton = SHOW_SORT_BUTTON.get();
       lockModifierKey = LOCK_MODIFIER_KEY.get();
-      lockTintColor = parseColor(LOCK_TINT_COLOR.get(), 0x800000FF);
+      lockTintColor = parseColor(LOCK_TINT_COLOR.get(), 0x80FFD700);
       showLockTooltip = SHOW_LOCK_TOOLTIP.get();
     } else if (spec == SERVER_SPEC) {
       defaultSortMethod = DEFAULT_SORT_METHOD.get();
@@ -201,7 +201,7 @@ public class Config {
   /**
    * Parses a hex RGBA color string and converts it to an ARGB integer.
    *
-   * @param hex the hex RGBA string (e.g. "0000FF80")
+   * @param hex the hex RGBA string (e.g. "FFD70080")
    * @param fallback the fallback ARGB value if parsing fails
    * @return the parsed color as an ARGB integer
    */
