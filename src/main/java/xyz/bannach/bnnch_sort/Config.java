@@ -61,14 +61,14 @@ public class Config {
           .comment("Modifier key to hold while clicking a slot to toggle its lock state")
           .defineEnum("lockModifierKey", ModifierKey.ALT);
 
-  /** Config value for the tint color applied to locked slots (hex ARGB). */
+  /** Config value for the tint color applied to locked slots (hex RGBA). */
   private static final ModConfigSpec.ConfigValue<String> LOCK_TINT_COLOR =
       CLIENT_BUILDER
           .comment(
-              "Tint color for locked slots in hex ARGB format (e.g. 800000FF for semi-transparent blue)")
+              "Tint color for locked slots in hex RGBA format (e.g. 0000FF80 for semi-transparent blue)")
           .define(
               "lockTintColor",
-              "800000FF",
+              "0000FF80",
               s -> {
                 try {
                   Long.parseLong((String) s, 16);
@@ -199,15 +199,20 @@ public class Config {
   }
 
   /**
-   * Parses a hex ARGB color string into an integer.
+   * Parses a hex RGBA color string and converts it to an ARGB integer.
    *
-   * @param hex the hex string (e.g. "800000FF")
-   * @param fallback the fallback value if parsing fails
-   * @return the parsed ARGB color as an integer
+   * @param hex the hex RGBA string (e.g. "0000FF80")
+   * @param fallback the fallback ARGB value if parsing fails
+   * @return the parsed color as an ARGB integer
    */
   private static int parseColor(String hex, int fallback) {
     try {
-      return (int) Long.parseLong(hex, 16);
+      long rgba = Long.parseLong(hex, 16);
+      int r = (int) ((rgba >> 24) & 0xFF);
+      int g = (int) ((rgba >> 16) & 0xFF);
+      int b = (int) ((rgba >> 8) & 0xFF);
+      int a = (int) (rgba & 0xFF);
+      return (a << 24) | (r << 16) | (g << 8) | b;
     } catch (NumberFormatException e) {
       return fallback;
     }
