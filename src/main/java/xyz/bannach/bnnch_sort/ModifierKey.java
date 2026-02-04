@@ -21,12 +21,23 @@ public enum ModifierKey implements StringRepresentable {
   CONTROL("control"),
   SHIFT("shift");
 
+  /** The string representation used for serialization and translation keys. */
   private final String serializedName;
 
+  /**
+   * Constructs a ModifierKey with the given serialized name.
+   *
+   * @param serializedName the string identifier for this modifier key
+   */
   ModifierKey(String serializedName) {
     this.serializedName = serializedName;
   }
 
+  /**
+   * Returns the serialized name of this modifier key.
+   *
+   * @return the string identifier for this modifier key
+   */
   @Override
   public @NotNull String getSerializedName() {
     return serializedName;

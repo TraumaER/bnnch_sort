@@ -29,6 +29,11 @@ public record ToggleLockPayload(int slotIndex) implements CustomPacketPayload {
       StreamCodec.composite(
           ByteBufCodecs.VAR_INT, ToggleLockPayload::slotIndex, ToggleLockPayload::new);
 
+  /**
+   * Returns the payload type for this packet.
+   *
+   * @return the registered payload type
+   */
   @Override
   public @NotNull Type<? extends CustomPacketPayload> type() {
     return TYPE;

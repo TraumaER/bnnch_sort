@@ -37,6 +37,11 @@ public record SyncLockedSlotsPayload(Set<Integer> lockedSlots) implements Custom
       StreamCodec.composite(
           INT_SET_CODEC, SyncLockedSlotsPayload::lockedSlots, SyncLockedSlotsPayload::new);
 
+  /**
+   * Returns the payload type for this packet.
+   *
+   * @return the registered payload type
+   */
   @Override
   public @NotNull Type<? extends CustomPacketPayload> type() {
     return TYPE;
