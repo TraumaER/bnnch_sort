@@ -106,8 +106,12 @@ Located at `config/bnnch_sort-client.toml`
 | `lockTintColor`   | `0000FF80` | RGBA hex color for the locked slot overlay tint            |
 | `showLockTooltip` | `true`     | Show unlock hint tooltip on locked slots                   |
 
+#### Lock Tint Color
+
 The `lockTintColor` value uses RGBA hex format. You can use a color picker like
 [rgbcolorpicker.com](https://rgbcolorpicker.com/) to choose a color and append the alpha value (00-FF) for transparency.
+
+Here are some examples (at 50% opacity): `FF000080` (red), `FFD70080` (gold), `00FF0080` (green), `0000FF80` (blue).
 
 ### Server Configuration
 
