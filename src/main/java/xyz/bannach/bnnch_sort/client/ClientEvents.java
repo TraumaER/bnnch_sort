@@ -2,12 +2,17 @@ package xyz.bannach.bnnch_sort.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import xyz.bannach.bnnch_sort.BnnchSort;
+import xyz.bannach.bnnch_sort.Config;
 
 /**
  * Client-side event handlers for screen interactions and rendering.
@@ -63,6 +68,10 @@ public class ClientEvents {
    */
   @SubscribeEvent
   public static void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
+    if (SlotLockInputHandler.onMouseClicked(event)) {
+      event.setCanceled(true);
+      return;
+    }
     SortKeyHandler.onMouseClicked(event);
   }
 
@@ -80,6 +89,37 @@ public class ClientEvents {
   }
 
   /**
+   * Appends lock tooltip text to item tooltips for items in locked player inventory slots.
+   *
+   * <p>This complements {@link SlotLockRenderer#renderLockTooltip}, which handles empty locked
+   * slots. Together they ensure the lock tooltip is visible on all locked slots per FR-LOCK-003a.
+   *
+   * @param event the item tooltip event
+   */
+  @SubscribeEvent
+  public static void onItemTooltip(ItemTooltipEvent event) {
+    if (!Config.showLockTooltip) {
+      return;
+    }
+    if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) {
+      return;
+    }
+    Slot hoveredSlot = screen.getSlotUnderMouse();
+    if (hoveredSlot == null || !(hoveredSlot.container instanceof Inventory)) {
+      return;
+    }
+    int containerSlot = hoveredSlot.getContainerSlot();
+    if (containerSlot < 0 || containerSlot > 35) {
+      return;
+    }
+    if (!ClientLockedSlotsCache.isLocked(containerSlot)) {
+      return;
+    }
+    Component modifierName = Component.translatable(Config.lockModifierKey.getTranslationKey());
+    event.getToolTip().add(Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName));
+  }
+
+  /**
    * Handles screen render events to display feedback overlays.
    *
    * <p>Renders the current feedback message (if any) as a centered overlay at the top of the screen
@@ -89,6 +129,12 @@ public class ClientEvents {
    */
   @SubscribeEvent
   public static void onScreenRender(ScreenEvent.Render.Post event) {
+    if (event.getScreen() instanceof AbstractContainerScreen<?> screen) {
+      GuiGraphics guiGraphics = event.getGuiGraphics();
+      SlotLockRenderer.renderLockOverlays(screen, guiGraphics);
+      SlotLockRenderer.renderLockTooltip(screen, guiGraphics, event.getMouseX(), event.getMouseY());
+    }
+
     Component message = SortFeedback.getDisplayMessage();
     if (message == null) {
       return;

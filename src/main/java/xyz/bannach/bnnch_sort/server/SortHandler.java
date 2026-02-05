@@ -7,6 +7,7 @@ import java.util.Set;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
@@ -15,6 +16,8 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
+import xyz.bannach.bnnch_sort.sorting.LockedSlots;
+import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 /**
  * Server-side handler for sort request payloads.
@@ -102,29 +105,121 @@ public class SortHandler {
           AbstractContainerMenu menu = player.containerMenu;
           if (payload.region() == REGION_CONTAINER && menu == player.inventoryMenu) return;
 
-          List<Slot> targetSlots = getTargetSlots(menu, payload.region());
-          if (targetSlots.isEmpty()) {
-            return;
+          int region = payload.region();
+          if (region == REGION_PLAYER_MAIN || region == REGION_PLAYER_HOTBAR) {
+            sortRegion(player, menu, region);
+          } else {
+            sortContainerRegion(menu, player);
           }
-
-          // Extract ItemStacks from slots
-          List<ItemStack> stacks = new ArrayList<>();
-          for (Slot slot : targetSlots) {
-            stacks.add(slot.getItem().copy());
-          }
-
-          // Sort stacks
-          List<ItemStack> sorted =
-              ItemSorter.sort(stacks, player.getData(ModAttachments.SORT_PREFERENCE));
-
-          // Write sorted stacks back to slots
-          for (int i = 0; i < targetSlots.size(); i++) {
-            targetSlots.get(i).set(sorted.get(i));
-          }
-
-          // Sync to client
-          menu.broadcastChanges();
         });
+  }
+
+  /**
+   * Sorts a container region (chest, shulker, etc.) without lock awareness.
+   *
+   * @param menu the container menu
+   * @param player the player performing the sort
+   */
+  private static void sortContainerRegion(AbstractContainerMenu menu, ServerPlayer player) {
+    List<Slot> targetSlots = getTargetSlots(menu, REGION_CONTAINER);
+    if (targetSlots.isEmpty()) {
+      return;
+    }
+
+    List<ItemStack> stacks = new ArrayList<>();
+    for (Slot slot : targetSlots) {
+      stacks.add(slot.getItem().copy());
+    }
+
+    List<ItemStack> sorted =
+        ItemSorter.sort(stacks, player.getData(ModAttachments.SORT_PREFERENCE));
+
+    for (int i = 0; i < targetSlots.size(); i++) {
+      targetSlots.get(i).set(sorted.get(i));
+    }
+
+    menu.broadcastChanges();
+  }
+
+  /**
+   * Sorts a player inventory region with lock awareness.
+   *
+   * <p>Locked slots are excluded from sorting. Non-full stackable items in locked slots may receive
+   * matching items merged from unlocked slots during the sort.
+   *
+   * @param player the player whose inventory is being sorted
+   * @param menu the container menu
+   * @param region the region code ({@link #REGION_PLAYER_MAIN} or {@link #REGION_PLAYER_HOTBAR})
+   */
+  public static void sortRegion(Player player, AbstractContainerMenu menu, int region) {
+    List<Slot> targetSlots = getTargetSlots(menu, region);
+    if (targetSlots.isEmpty()) {
+      return;
+    }
+
+    LockedSlots lockedSlots = player.getData(ModAttachments.LOCKED_SLOTS);
+    SortPreference preference = player.getData(ModAttachments.SORT_PREFERENCE);
+
+    // Partition into locked and unlocked
+    List<Slot> locked = new ArrayList<>();
+    List<Slot> unlocked = new ArrayList<>();
+    for (Slot slot : targetSlots) {
+      if (lockedSlots.isLocked(slot.getContainerSlot())) {
+        locked.add(slot);
+      } else {
+        unlocked.add(slot);
+      }
+    }
+
+    // Extract unlocked items
+    List<ItemStack> unlockedItems = new ArrayList<>();
+    for (Slot slot : unlocked) {
+      unlockedItems.add(slot.getItem().copy());
+    }
+
+    // Pre-sort merge: fill locked non-full stacks from unlocked items
+    for (Slot lockedSlot : locked) {
+      ItemStack lockedItem = lockedSlot.getItem();
+      if (lockedItem.isEmpty() || lockedItem.getCount() >= lockedItem.getMaxStackSize()) {
+        continue;
+      }
+      if (lockedItem.getMaxStackSize() <= 1) {
+        continue;
+      }
+
+      for (int i = 0; i < unlockedItems.size(); i++) {
+        ItemStack unlockedItem = unlockedItems.get(i);
+        if (unlockedItem.isEmpty()) {
+          continue;
+        }
+        if (ItemStack.isSameItemSameComponents(lockedItem, unlockedItem)) {
+          int space = lockedItem.getMaxStackSize() - lockedItem.getCount();
+          if (space > 0) {
+            int transfer = Math.min(space, unlockedItem.getCount());
+            lockedItem.grow(transfer);
+            unlockedItem.shrink(transfer);
+            if (unlockedItem.isEmpty()) {
+              unlockedItems.set(i, ItemStack.EMPTY);
+            }
+          }
+        }
+        if (lockedItem.getCount() >= lockedItem.getMaxStackSize()) {
+          break;
+        }
+      }
+
+      lockedSlot.set(lockedItem);
+    }
+
+    // Sort unlocked items
+    List<ItemStack> sorted = ItemSorter.sort(unlockedItems, preference);
+
+    // Write sorted items back to unlocked slots
+    for (int i = 0; i < unlocked.size(); i++) {
+      unlocked.get(i).set(sorted.get(i));
+    }
+
+    menu.broadcastChanges();
   }
 
   /**

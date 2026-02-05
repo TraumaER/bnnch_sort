@@ -9,6 +9,7 @@ customizable preferences, and an intuitive user interface.
 
 - **Four Sorting Methods**: Sort items alphabetically, by category, by quantity, or by mod ID
 - **Ascending/Descending Order**: Reverse any sorting method with a single keypress
+- **Slot Locking**: Lock specific inventory slots to exclude them from sorting
 - **Smart Stack Merging**: Automatically combines partial stacks before sorting
 - **Visual Feedback**: On-screen overlay shows current sort preferences
 - **Keybindings**: Quick keyboard shortcuts for sorting and cycling preferences
@@ -36,16 +37,31 @@ customizable preferences, and an intuitive user interface.
 
 ### Keybindings
 
-| Key | Action                                             |
-|-----|----------------------------------------------------|
-| `R` | Sort the inventory region under your cursor        |
-| `P` | Cycle to the next sort preference (method + order) |
+| Key             | Action                                             |
+|-----------------|----------------------------------------------------|
+| `R`             | Sort the inventory region under your cursor        |
+| `P`             | Cycle to the next sort preference (method + order) |
+| `Alt` + `Click` | Toggle slot lock on a player inventory slot        |
 
 The sort key automatically detects which inventory section to sort based on mouse position:
 
 - Hovering over a container (chest, shulker box) sorts that container
 - Hovering over your main inventory sorts the 27-slot grid
 - Hovering over your hotbar sorts just the hotbar
+
+### Slot Locking
+
+Hold the modifier key (default: `Alt`) and click a player inventory slot to lock or unlock it. Locked slots are
+highlighted with a colored tint and are excluded from sorting operations.
+
+- **Locked slots keep their contents** in place when sorting occurs
+- **Locked empty slots** remain empty during sorts
+- **Non-full stacks** in locked slots can still receive matching items merged from unlocked slots during sorting
+- Lock state **persists across death, relog, and dimension changes**
+- Only player inventory slots (main grid and hotbar) can be locked — container slots cannot
+
+Hovering over an empty locked slot shows a tooltip with unlock instructions. The modifier key, tint color, and tooltip
+visibility are all configurable in the client config.
 
 ### Commands
 
@@ -61,10 +77,13 @@ All commands use the `/bnnchsort` prefix:
 
 /bnnchsort reset               - Reset preferences to server defaults
 
+/bnnchsort unlock              - Unlock all locked inventory slots
+
 /bnnchsort config [key]        - View configuration settings
                            Keys: method, order, button
 
 /bnnchsort help                - Display help and current preferences
+                           Also shows locked slot counts
 ```
 
 ### UI Button
@@ -80,9 +99,19 @@ The button can be disabled in the client configuration.
 
 Located at `config/bnnch_sort-client.toml`
 
-| Option           | Default | Description                                  |
-|------------------|---------|----------------------------------------------|
-| `showSortButton` | `true`  | Display the sort button on container screens |
+| Option            | Default    | Description                                                |
+|-------------------|------------|------------------------------------------------------------|
+| `showSortButton`  | `true`     | Display the sort button on container screens               |
+| `lockModifierKey` | `ALT`      | Modifier key for locking slots (`ALT`, `CONTROL`, `SHIFT`) |
+| `lockTintColor`   | `FFD70080` | RGBA hex color for the locked slot overlay tint            |
+| `showLockTooltip` | `true`     | Show unlock hint tooltip on locked slots                   |
+
+#### Lock Tint Color
+
+The `lockTintColor` value uses RGBA hex format. You can use a color picker like
+[rgbcolorpicker.com](https://rgbcolorpicker.com/) to choose a color and append the alpha value (00-FF) for transparency.
+
+Here are some examples (at 50% opacity): `FF000080` (red), `FFD70080` (gold), `00FF0080` (green), `0000FF80` (blue).
 
 ### Server Configuration
 
@@ -118,6 +147,7 @@ The following slot types are never sorted:
 - Crafting grid slots
 - Furnace input/output/fuel slots
 - Other special result slots
+- Player-locked slots (see [Slot Locking](#slot-locking))
 
 ## Building from Source
 
@@ -155,29 +185,37 @@ The compiled `.jar` file will be in `build/libs/`.
 
 ```
 src/main/java/xyz/bannach/bnnch_sort/
-├── BnnchSort.java   # Mod entrypoint
+├── BnnchSort.java               # Mod entrypoint
 ├── Config.java                  # Configuration management
 ├── ModAttachments.java          # Player preference persistence
+├── ModifierKey.java             # Modifier key enum (Alt/Ctrl/Shift)
 ├── sorting/                     # Core sorting logic
 │   ├── SortMethod.java          # Sorting method enum
 │   ├── SortOrder.java           # Sort order enum
 │   ├── SortPreference.java      # Preference record
 │   ├── ItemSorter.java          # Main sorting pipeline
+│   ├── LockedSlots.java         # Locked slot state record
 │   └── comparator/              # Sort comparators
 ├── client/                      # Client-side UI and input
 │   ├── SortKeyHandler.java      # Keybinding handling
+│   ├── SlotLockInputHandler.java # Slot lock click handling
+│   ├── SlotLockRenderer.java    # Locked slot visual overlay
+│   ├── ClientLockedSlotsCache.java # Client-side lock state
 │   ├── SortButton.java          # UI button widget
 │   ├── SortFeedback.java        # Visual feedback overlay
 │   └── ScreenButtonInjector.java
 ├── server/                      # Server-side handlers
 │   ├── SortHandler.java         # Sort request processing
+│   ├── LockHandler.java         # Slot lock toggle processing
 │   └── PreferenceHandler.java   # Preference management
 ├── commands/                    # Slash commands
 │   └── ModCommands.java
 └── network/                     # Network packets
     ├── SortRequestPayload.java
     ├── CyclePreferencePayload.java
-    └── SyncPreferencePayload.java
+    ├── SyncPreferencePayload.java
+    ├── ToggleLockPayload.java
+    └── SyncLockedSlotsPayload.java
 ```
 
 ## Technical Details
@@ -192,11 +230,13 @@ src/main/java/xyz/bannach/bnnch_sort/
 
 ### Network Protocol
 
-The mod uses three custom network packets:
+The mod uses five custom network packets:
 
 - `SortRequestPayload`: Client requests a sort operation
 - `CyclePreferencePayload`: Client requests preference cycling
 - `SyncPreferencePayload`: Server syncs preferences to client
+- `ToggleLockPayload`: Client requests toggling a slot lock
+- `SyncLockedSlotsPayload`: Server syncs locked slot state to client
 
 All packets use protocol version "1".
 
@@ -208,14 +248,15 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for det
 
 1. Fork the repository
 2. Create a branch from `main` (or `mc/*` for version-specific changes):
-   - `feature/<name>` for new features
-   - `fix/<name>` for bug fixes
+    - `feature/<name>` for new features
+    - `fix/<name>` for bug fixes
 3. Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
 4. Submit a pull request with a clear description
 
 ### Branching Strategy
 
 See [docs/BRANCHING_AND_RELEASE.md](docs/BRANCHING_AND_RELEASE.md) for details on:
+
 - Branch structure and naming conventions
 - Multi-version support workflow
 - Release process

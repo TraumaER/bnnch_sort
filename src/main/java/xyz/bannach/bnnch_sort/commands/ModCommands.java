@@ -4,9 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,8 +12,6 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -23,9 +19,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import xyz.bannach.bnnch_sort.BnnchSort;
 import xyz.bannach.bnnch_sort.Config;
 import xyz.bannach.bnnch_sort.ModAttachments;
+import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
 import xyz.bannach.bnnch_sort.server.SortHandler;
-import xyz.bannach.bnnch_sort.sorting.ItemSorter;
+import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
@@ -115,6 +112,7 @@ public class ModCommands {
                                     executeSortInv(
                                         context, StringArgumentType.getString(context, "region")))))
             .then(Commands.literal("help").executes(ModCommands::executeHelp))
+            .then(Commands.literal("unlock").executes(ModCommands::executeUnlock))
             .then(
                 Commands.literal("change")
                     .then(
@@ -161,21 +159,20 @@ public class ModCommands {
     }
 
     AbstractContainerMenu menu = player.containerMenu;
-    SortPreference preference = player.getData(ModAttachments.SORT_PREFERENCE);
 
     String regionKey;
     switch (region.toLowerCase()) {
       case "hotbar" -> {
-        sortRegion(menu, SortHandler.REGION_PLAYER_HOTBAR, preference);
+        SortHandler.sortRegion(player, menu, SortHandler.REGION_PLAYER_HOTBAR);
         regionKey = "command.bnnch_sort.sortinv.region.hotbar";
       }
       case "main" -> {
-        sortRegion(menu, SortHandler.REGION_PLAYER_MAIN, preference);
+        SortHandler.sortRegion(player, menu, SortHandler.REGION_PLAYER_MAIN);
         regionKey = "command.bnnch_sort.sortinv.region.main";
       }
       case "all" -> {
-        sortRegion(menu, SortHandler.REGION_PLAYER_MAIN, preference);
-        sortRegion(menu, SortHandler.REGION_PLAYER_HOTBAR, preference);
+        SortHandler.sortRegion(player, menu, SortHandler.REGION_PLAYER_MAIN);
+        SortHandler.sortRegion(player, menu, SortHandler.REGION_PLAYER_HOTBAR);
         regionKey = "command.bnnch_sort.sortinv.region.all";
       }
       default -> {
@@ -199,32 +196,38 @@ public class ModCommands {
   }
 
   /**
-   * Sorts a specific inventory region using the given preferences.
+   * Executes the /bnnchsort unlock command to clear all locked slots.
    *
-   * <p>Extracts items from the target slots, sorts them, and writes them back. This is a helper
-   * method used by {@link #executeSortInv}.
-   *
-   * @param menu the container menu to sort within
-   * @param region the region code to sort
-   * @param preference the sort preferences to apply
+   * @param context the command context containing the source
+   * @return 1 on success, 0 on failure
    */
-  private static void sortRegion(
-      AbstractContainerMenu menu, int region, SortPreference preference) {
-    List<Slot> targetSlots = SortHandler.getTargetSlots(menu, region);
-    if (targetSlots.isEmpty()) {
-      return;
+  private static int executeUnlock(CommandContext<CommandSourceStack> context) {
+    ServerPlayer player = context.getSource().getPlayer();
+    if (player == null) {
+      context
+          .getSource()
+          .sendFailure(Component.literal("This command can only be run by a player"));
+      return 0;
     }
 
-    List<ItemStack> stacks = new ArrayList<>();
-    for (Slot slot : targetSlots) {
-      stacks.add(slot.getItem().copy());
+    LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
+    if (locked.slots().isEmpty()) {
+      context
+          .getSource()
+          .sendSuccess(() -> Component.translatable("command.bnnch_sort.unlock.none"), false);
+      return 1;
     }
 
-    List<ItemStack> sorted = ItemSorter.sort(stacks, preference);
+    int count = locked.slots().size();
+    player.setData(ModAttachments.LOCKED_SLOTS, LockedSlots.EMPTY);
+    PacketDistributor.sendToPlayer(player, new SyncLockedSlotsPayload(LockedSlots.EMPTY.slots()));
 
-    for (int i = 0; i < targetSlots.size(); i++) {
-      targetSlots.get(i).set(sorted.get(i));
-    }
+    context
+        .getSource()
+        .sendSuccess(
+            () -> Component.translatable("command.bnnch_sort.unlock.success", count), false);
+
+    return 1;
   }
 
   /**
@@ -259,6 +262,9 @@ public class ModCommands {
         .sendSuccess(() -> Component.translatable("command.bnnch_sort.help.config"), false);
     context
         .getSource()
+        .sendSuccess(() -> Component.translatable("command.bnnch_sort.help.unlock"), false);
+    context
+        .getSource()
         .sendSuccess(
             () ->
                 Component.translatable(
@@ -266,6 +272,19 @@ public class ModCommands {
                     Component.translatable(current.method().getTranslationKey()),
                     Component.translatable(current.order().getTranslationKey())),
             false);
+
+    if (player != null) {
+      LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
+      int mainLocked = locked.countInRange(9, 35);
+      int hotbarLocked = locked.countInRange(0, 8);
+      context
+          .getSource()
+          .sendSuccess(
+              () ->
+                  Component.translatable(
+                      "command.bnnch_sort.help.locked", mainLocked, hotbarLocked),
+              false);
+    }
 
     return 1;
   }

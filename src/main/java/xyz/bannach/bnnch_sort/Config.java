@@ -55,6 +55,35 @@ public class Config {
           .comment("Show the sort button on supported container screens")
           .define("showSortButton", true);
 
+  /** Config value for the modifier key used to lock/unlock slots. */
+  private static final ModConfigSpec.EnumValue<ModifierKey> LOCK_MODIFIER_KEY =
+      CLIENT_BUILDER
+          .comment("Modifier key to hold while clicking a slot to toggle its lock state")
+          .defineEnum("lockModifierKey", ModifierKey.ALT);
+
+  /** Config value for the tint color applied to locked slots (hex RGBA). */
+  private static final ModConfigSpec.ConfigValue<String> LOCK_TINT_COLOR =
+      CLIENT_BUILDER
+          .comment(
+              "Tint color for locked slots in hex RGBA format (e.g. FFD70080 for semi-transparent gold)")
+          .define(
+              "lockTintColor",
+              "FFD70080",
+              s -> {
+                try {
+                  Long.parseLong((String) s, 16);
+                  return true;
+                } catch (Exception e) {
+                  return false;
+                }
+              });
+
+  /** Config value for whether to show a tooltip on locked slots. */
+  private static final ModConfigSpec.BooleanValue SHOW_LOCK_TOOLTIP =
+      CLIENT_BUILDER
+          .comment("Show a tooltip when hovering over an empty locked slot")
+          .define("showLockTooltip", true);
+
   /** Config value for the default sort method applied to new players. */
   private static final ModConfigSpec.EnumValue<SortMethod> DEFAULT_SORT_METHOD =
       SERVER_BUILDER
@@ -83,6 +112,33 @@ public class Config {
   public static boolean showSortButton = true;
 
   /**
+   * The modifier key used to lock/unlock inventory slots.
+   *
+   * <p>Default: {@link ModifierKey#ALT}
+   *
+   * <p>Side: Client only
+   */
+  public static ModifierKey lockModifierKey = ModifierKey.ALT;
+
+  /**
+   * The tint color applied to locked slots as an ARGB integer.
+   *
+   * <p>Default: {@code 0x800000FF} (semi-transparent blue)
+   *
+   * <p>Side: Client only
+   */
+  public static int lockTintColor = 0x800000FF;
+
+  /**
+   * Whether to show a tooltip when hovering over an empty locked slot.
+   *
+   * <p>Default: {@code true}
+   *
+   * <p>Side: Client only
+   */
+  public static boolean showLockTooltip = true;
+
+  /**
    * The default sort method assigned to new players.
    *
    * <p>Default: {@link SortMethod#ALPHABETICAL}
@@ -103,18 +159,62 @@ public class Config {
   /**
    * Handles configuration loading events.
    *
-   * <p>Updates the static configuration fields when config files are loaded or reloaded. Client and
-   * server configs are handled separately based on the spec.
+   * <p>Updates the static configuration fields when config files are loaded. Client and server
+   * configs are handled separately based on the spec.
    *
    * @param event the config loading event containing the loaded configuration
    */
   @SubscribeEvent
   public static void onLoad(final ModConfigEvent.Loading event) {
-    if (event.getConfig().getSpec() == CLIENT_SPEC) {
+    applyConfig(event.getConfig().getSpec());
+  }
+
+  /**
+   * Handles configuration reloading events.
+   *
+   * <p>Updates the static configuration fields when config files are changed at runtime.
+   *
+   * @param event the config reloading event containing the reloaded configuration
+   */
+  @SubscribeEvent
+  public static void onReload(final ModConfigEvent.Reloading event) {
+    applyConfig(event.getConfig().getSpec());
+  }
+
+  /**
+   * Applies configuration values from the given spec to the static fields.
+   *
+   * @param spec the config spec that was loaded or reloaded
+   */
+  private static void applyConfig(Object spec) {
+    if (spec == CLIENT_SPEC) {
       showSortButton = SHOW_SORT_BUTTON.get();
-    } else if (event.getConfig().getSpec() == SERVER_SPEC) {
+      lockModifierKey = LOCK_MODIFIER_KEY.get();
+      lockTintColor = parseColor(LOCK_TINT_COLOR.get(), 0x80FFD700);
+      showLockTooltip = SHOW_LOCK_TOOLTIP.get();
+    } else if (spec == SERVER_SPEC) {
       defaultSortMethod = DEFAULT_SORT_METHOD.get();
       defaultSortOrder = DEFAULT_SORT_ORDER.get();
+    }
+  }
+
+  /**
+   * Parses a hex RGBA color string and converts it to an ARGB integer.
+   *
+   * @param hex the hex RGBA string (e.g. "FFD70080")
+   * @param fallback the fallback ARGB value if parsing fails
+   * @return the parsed color as an ARGB integer
+   */
+  private static int parseColor(String hex, int fallback) {
+    try {
+      long rgba = Long.parseLong(hex, 16);
+      int r = (int) ((rgba >> 24) & 0xFF);
+      int g = (int) ((rgba >> 16) & 0xFF);
+      int b = (int) ((rgba >> 8) & 0xFF);
+      int a = (int) (rgba & 0xFF);
+      return (a << 24) | (r << 16) | (g << 8) | b;
+    } catch (NumberFormatException e) {
+      return fallback;
     }
   }
 }

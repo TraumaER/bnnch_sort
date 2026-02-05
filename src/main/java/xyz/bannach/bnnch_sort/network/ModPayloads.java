@@ -5,7 +5,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import xyz.bannach.bnnch_sort.BnnchSort;
+import xyz.bannach.bnnch_sort.client.ClientLockedSlotsCache;
 import xyz.bannach.bnnch_sort.client.ClientPreferenceCache;
+import xyz.bannach.bnnch_sort.server.LockHandler;
 import xyz.bannach.bnnch_sort.server.PreferenceHandler;
 import xyz.bannach.bnnch_sort.server.SortHandler;
 
@@ -61,5 +63,11 @@ public class ModPayloads {
         SyncPreferencePayload.TYPE,
         SyncPreferencePayload.STREAM_CODEC,
         ClientPreferenceCache::handle);
+    registrar.playToServer(
+        ToggleLockPayload.TYPE, ToggleLockPayload.STREAM_CODEC, LockHandler::handle);
+    registrar.playToClient(
+        SyncLockedSlotsPayload.TYPE,
+        SyncLockedSlotsPayload.STREAM_CODEC,
+        ClientLockedSlotsCache::handle);
   }
 }

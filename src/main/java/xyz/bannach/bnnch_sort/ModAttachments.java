@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 /**
@@ -59,6 +60,27 @@ public class ModAttachments {
               AttachmentType.builder(
                       () -> new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder))
                   .serialize(SortPreference.CODEC)
+                  .copyOnDeath()
+                  .build());
+
+  /**
+   * Player attachment for storing locked inventory slots.
+   *
+   * <p>This attachment stores a {@link LockedSlots} containing the set of slot indices that should
+   * be excluded from sorting. The attachment has the following properties:
+   *
+   * <ul>
+   *   <li>Default value: {@link LockedSlots#EMPTY} (no slots locked)
+   *   <li>Serialization: Uses {@link LockedSlots#CODEC} for NBT persistence
+   *   <li>Death behavior: Preserved across player death (copyOnDeath)
+   * </ul>
+   */
+  public static final Supplier<AttachmentType<LockedSlots>> LOCKED_SLOTS =
+      ATTACHMENT_TYPES.register(
+          "locked_slots",
+          () ->
+              AttachmentType.builder(() -> LockedSlots.EMPTY)
+                  .serialize(LockedSlots.CODEC)
                   .copyOnDeath()
                   .build());
 }
