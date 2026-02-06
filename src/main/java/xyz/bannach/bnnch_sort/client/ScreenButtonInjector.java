@@ -1,9 +1,7 @@
 package xyz.bannach.bnnch_sort.client;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import xyz.bannach.bnnch_sort.Config;
 import xyz.bannach.bnnch_sort.server.SortHandler;
@@ -14,13 +12,18 @@ import xyz.bannach.bnnch_sort.server.SortHandler;
  * <p>This class handles the automatic addition of {@link SortButton} widgets to container screens
  * during their initialization. The button is positioned to the right of the container GUI.
  *
- * <h2>Supported Screens</h2>
+ * <h2>Container Detection</h2>
+ *
+ * <p>Uses generic detection to support any container with sortable slots, including:
  *
  * <ul>
- *   <li>{@link ChestMenu} - Single and double chests
- *   <li>{@link ShulkerBoxMenu} - Shulker boxes
- *   <li>{@link InventoryMenu} - Player inventory screen
+ *   <li>Vanilla containers - chests, shulker boxes
+ *   <li>Modded containers - MetalBarrels, Sophisticated Storage, Iron Chests, etc.
+ *   <li>Player inventory screen
  * </ul>
+ *
+ * <p>The detection automatically excludes containers with special slots (furnaces, crafting tables,
+ * etc.) by leveraging {@link SortHandler#getTargetSlots}.
  *
  * <h2>Configuration</h2>
  *
@@ -32,6 +35,7 @@ import xyz.bannach.bnnch_sort.server.SortHandler;
  *
  * @see SortButton
  * @see Config#showSortButton
+ * @see SortHandler#getTargetSlots
  * @since 1.0.0
  */
 public class ScreenButtonInjector {
@@ -44,6 +48,10 @@ public class ScreenButtonInjector {
    *
    * <p>Called after a screen is initialized. If the screen is a supported container type and the
    * button is enabled in config, a {@link SortButton} is added to the screen's widget list.
+   *
+   * <p>This method uses generic container detection: any menu with sortable container slots will
+   * receive a sort button, automatically supporting modded containers like MetalBarrels,
+   * Sophisticated Storage, and others without requiring hardcoded menu type checks.
    *
    * @param event the screen initialization event
    */
@@ -58,9 +66,12 @@ public class ScreenButtonInjector {
     var menu = screen.getMenu();
     int sortRegion;
 
-    if (menu instanceof ChestMenu || menu instanceof ShulkerBoxMenu) {
+    // Try container region first (works for vanilla chests, shulker boxes, and any modded
+    // containers)
+    if (!SortHandler.getTargetSlots(menu, SortHandler.REGION_CONTAINER).isEmpty()) {
       sortRegion = SortHandler.REGION_CONTAINER;
     } else if (menu instanceof InventoryMenu) {
+      // Fallback to player inventory for standalone inventory screen
       sortRegion = SortHandler.REGION_PLAYER_MAIN;
     } else {
       return;
