@@ -14,6 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import xyz.bannach.bnnch_sort.network.CyclePreferencePayload;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
 import xyz.bannach.bnnch_sort.server.SortHandler;
+import xyz.bannach.bnnch_sort.util.SlotUtils;
 
 /**
  * Manages keybinding registration and input handling for sort operations.
@@ -175,7 +176,7 @@ public class SortKeyHandler {
    * <p>A slot is sortable if:
    *
    * <ul>
-   *   <li>It uses the base {@link Slot} class (not a special subclass)
+   *   <li>It uses a sortable slot class ({@link Slot} or {@code SlotItemHandler})
    *   <li>It's not an armor or offhand slot (inventory slots 36+)
    *   <li>It's not part of a crafting grid
    * </ul>
@@ -186,7 +187,8 @@ public class SortKeyHandler {
   private static boolean isSlotSortable(Slot slot) {
     // Reject special slot subclasses (ResultSlot, FurnaceResultSlot, FurnaceFuelSlot, ArmorSlot,
     // etc.)
-    if (slot.getClass() != Slot.class) {
+    // Allow base Slot and NeoForge's SlotItemHandler (used by modded containers like MetalBarrels)
+    if (!SlotUtils.isSortableSlotClass(slot)) {
       return false;
     }
     // Reject armor/offhand slots (Inventory slots outside 0-35)

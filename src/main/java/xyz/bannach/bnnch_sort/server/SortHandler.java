@@ -18,6 +18,7 @@ import xyz.bannach.bnnch_sort.network.SortRequestPayload;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
 import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
+import xyz.bannach.bnnch_sort.util.SlotUtils;
 
 /**
  * Server-side handler for sort request payloads.
@@ -248,7 +249,7 @@ public class SortHandler {
     if (region == REGION_CONTAINER) {
       specialContainers = new HashSet<>();
       for (Slot slot : menu.slots) {
-        if (!(slot.container instanceof Inventory) && slot.getClass() != Slot.class) {
+        if (!(slot.container instanceof Inventory) && !SlotUtils.isSortableSlotClass(slot)) {
           specialContainers.add(slot.container);
         }
       }
@@ -261,7 +262,7 @@ public class SortHandler {
           switch (region) {
             case REGION_CONTAINER ->
                 !(slot.container instanceof Inventory)
-                    && slot.getClass() == Slot.class
+                    && SlotUtils.isSortableSlotClass(slot)
                     && !(slot.container instanceof CraftingContainer)
                     && !specialContainers.contains(slot.container);
             case REGION_PLAYER_MAIN ->
