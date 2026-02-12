@@ -24,7 +24,7 @@ import xyz.bannach.bnnch_sort.Config;
  * <h2>Handled Events</h2>
  *
  * <ul>
- *   <li>{@link ScreenEvent.KeyPressed.Pre} - Keyboard input for sort/cycle keybinds
+ *   <li>{@link ScreenEvent.KeyPressed.Post} - Keyboard input for sort/cycle keybinds
  *   <li>{@link ScreenEvent.MouseButtonPressed.Pre} - Mouse input for sort/cycle keybinds
  *   <li>{@link ScreenEvent.Init.Post} - Screen initialization for button injection
  *   <li>{@link ScreenEvent.Render.Post} - Screen rendering for feedback overlay
@@ -48,13 +48,14 @@ public class ClientEvents {
   /**
    * Handles keyboard input events on screens.
    *
-   * <p>Delegates to {@link SortKeyHandler#onKeyPressed(ScreenEvent.KeyPressed.Pre)} for processing
-   * sort and preference cycle keybinds.
+   * <p>Delegates to {@link SortKeyHandler#onKeyPressed(ScreenEvent.KeyPressed.Post)} for processing
+   * sort and preference cycle keybinds. Uses Post event to run after other mods (e.g., JEI) have
+   * processed the key, allowing them to cancel the event if they're handling text input.
    *
    * @param event the key pressed event
    */
   @SubscribeEvent
-  public static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+  public static void onKeyPressed(ScreenEvent.KeyPressed.Post event) {
     SortKeyHandler.onKeyPressed(event);
   }
 
