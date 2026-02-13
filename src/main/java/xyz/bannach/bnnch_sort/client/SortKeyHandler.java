@@ -2,6 +2,7 @@ package xyz.bannach.bnnch_sort.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -94,15 +95,36 @@ public class SortKeyHandler {
    * Handles keyboard input on container screens.
    *
    * <p>Checks if the pressed key matches either the sort or cycle preference keybind and performs
-   * the appropriate action. The event is canceled if a keybind matches.
+   * the appropriate action. Uses Post event to run after other mods (e.g., JEI) have had a chance
+   * to process the key and cancel it if they're handling text input.
+   *
+   * <p>Keybinds are ignored when:
+   *
+   * <ul>
+   *   <li>A text field has focus (e.g., vanilla rename screens)
+   *   <li>Another mod has already canceled the event (e.g., JEI search box is active)
+   * </ul>
    *
    * @param event the key pressed event
    */
-  public static void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
+  public static void onKeyPressed(ScreenEvent.KeyPressed.Post event) {
     if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
       return;
     }
+
+    // Don't process keybinds when typing in a text field (e.g., vanilla rename screens)
+    if (screen.getFocused() instanceof EditBox) {
+      return;
+    }
+
+    // Don't process if another mod (e.g., JEI) has already handled this key
+    if (event.isCanceled()) {
+      return;
+    }
+
     InputConstants.Key key = InputConstants.getKey(event.getKeyCode(), event.getScanCode());
+
+    // Process our keybinds
     if (CYCLE_PREFERENCE_KEY.isActiveAndMatches(key)) {
       PacketDistributor.sendToServer(new CyclePreferencePayload());
       SortFeedback.showPreferenceChange(
