@@ -49,6 +49,6 @@ public enum ModifierKey implements StringRepresentable {
    * @return the translation key
    */
   public String getTranslationKey() {
-    return "modifier_key." + BnnchSort.MODID + "." + serializedName;
+    return "modifier_key.bnnch_sort." + serializedName;
   }
 }

@@ -5,8 +5,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.server.PreferenceHandler;
 
 /**
  * Network payload sent from client to server to cycle sort preferences.
@@ -33,7 +31,7 @@ public record CyclePreferencePayload() implements CustomPacketPayload {
 
   /** The payload type identifier for registration and dispatch. */
   public static final Type<CyclePreferencePayload> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(BnnchSort.MODID, "cycle_preference"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath("bnnch_sort", "cycle_preference"));
 
   /**
    * Codec for encoding and decoding this payload.

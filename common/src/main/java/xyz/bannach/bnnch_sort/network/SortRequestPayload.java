@@ -6,8 +6,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.server.SortHandler;
 
 /**
  * Network payload sent from client to server to request inventory sorting.
@@ -34,7 +32,7 @@ public record SortRequestPayload(int region) implements CustomPacketPayload {
 
   /** The payload type identifier for registration and dispatch. */
   public static final Type<SortRequestPayload> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(BnnchSort.MODID, "sort_request"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath("bnnch_sort", "sort_request"));
 
   /** Codec for encoding and decoding this payload to/from a byte buffer. */
   public static final StreamCodec<ByteBuf, SortRequestPayload> STREAM_CODEC =

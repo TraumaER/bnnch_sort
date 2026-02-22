@@ -8,7 +8,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import xyz.bannach.bnnch_sort.BnnchSort;
 
 /**
  * Network payload sent from server to client to synchronize locked slot state.
@@ -24,7 +23,7 @@ public record SyncLockedSlotsPayload(Set<Integer> lockedSlots) implements Custom
 
   /** The payload type identifier for registration and dispatch. */
   public static final Type<SyncLockedSlotsPayload> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(BnnchSort.MODID, "sync_locked_slots"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath("bnnch_sort", "sync_locked_slots"));
 
   /** Stream codec for encoding a set of integers over the network. */
   private static final StreamCodec<ByteBuf, Set<Integer>> INT_SET_CODEC =

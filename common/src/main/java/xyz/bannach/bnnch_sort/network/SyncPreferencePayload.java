@@ -6,8 +6,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.client.ClientPreferenceCache;
 import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
 
@@ -38,7 +36,7 @@ public record SyncPreferencePayload(SortMethod method, SortOrder order)
 
   /** The payload type identifier for registration and dispatch. */
   public static final Type<SyncPreferencePayload> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(BnnchSort.MODID, "sync_preference"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath("bnnch_sort", "sync_preference"));
 
   /**
    * Codec for encoding and decoding this payload to/from a byte buffer.
