@@ -5,9 +5,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
-import xyz.bannach.bnnch_sort.BnnchSort;
+import xyz.bannach.bnnch_sort.CommonConfig;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
+import xyz.bannach.bnnch_sort.services.Services;
 
 /**
  * A clickable button widget that triggers inventory sorting.
@@ -42,7 +42,7 @@ public class SortButton extends Button {
 
   /** The texture resource location for the button icon. */
   private static final ResourceLocation TEXTURE =
-      ResourceLocation.fromNamespaceAndPath(BnnchSort.MODID, "textures/gui/sort_button.png");
+      ResourceLocation.fromNamespaceAndPath(CommonConfig.MODID, "textures/gui/sort_button.png");
 
   /** The size of the button in pixels (both width and height). */
   private static final int SIZE = 16;
@@ -76,7 +76,7 @@ public class SortButton extends Button {
    */
   @Override
   public void onPress() {
-    PacketDistributor.sendToServer(new SortRequestPayload(sortRegion));
+    Services.NETWORK.sendToServer(new SortRequestPayload(sortRegion));
     SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
   }
 
@@ -93,8 +93,8 @@ public class SortButton extends Button {
    */
   @Override
   protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-    setX(parentScreen.getGuiLeft() + parentScreen.getXSize() + 2);
-    setY(parentScreen.getGuiTop());
+    setX(parentScreen.leftPos + parentScreen.imageWidth + 2);
+    setY(parentScreen.topPos);
 
     // Background
     guiGraphics.fill(getX(), getY(), getX() + width, getY() + height, 0xCC222222);
@@ -109,7 +109,7 @@ public class SortButton extends Button {
               "tooltip.bnnch_sort.sort_button",
               Component.translatable(ClientPreferenceCache.getMethod().getTranslationKey()),
               Component.translatable(ClientPreferenceCache.getOrder().getTranslationKey()));
-      guiGraphics.renderTooltip(parentScreen.getMinecraft().font, status, mouseX, mouseY);
+      guiGraphics.renderTooltip(parentScreen.font, status, mouseX, mouseY);
     }
   }
 }

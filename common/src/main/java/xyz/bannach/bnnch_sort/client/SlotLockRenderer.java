@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 
 /**
  * Renders lock overlays and tooltips on locked inventory slots.
@@ -27,8 +27,8 @@ public class SlotLockRenderer {
    */
   public static void renderLockOverlays(
       AbstractContainerScreen<?> screen, GuiGraphics guiGraphics) {
-    int guiLeft = screen.getGuiLeft();
-    int guiTop = screen.getGuiTop();
+    int guiLeft = screen.leftPos;
+    int guiTop = screen.topPos;
 
     for (Slot slot : screen.getMenu().slots) {
       if (!(slot.container instanceof Inventory)) {
@@ -41,7 +41,7 @@ public class SlotLockRenderer {
       if (ClientLockedSlotsCache.isLocked(containerSlot)) {
         int x = guiLeft + slot.x;
         int y = guiTop + slot.y;
-        guiGraphics.fill(x, y, x + 16, y + 16, Config.lockTintColor);
+        guiGraphics.fill(x, y, x + 16, y + 16, CommonConfig.lockTintColor);
       }
     }
   }
@@ -59,11 +59,11 @@ public class SlotLockRenderer {
    */
   public static void renderLockTooltip(
       AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int mouseX, int mouseY) {
-    if (!Config.showLockTooltip) {
+    if (!CommonConfig.showLockTooltip) {
       return;
     }
 
-    Slot hoveredSlot = screen.getSlotUnderMouse();
+    Slot hoveredSlot = screen.hoveredSlot;
     if (hoveredSlot == null) {
       return;
     }
@@ -83,9 +83,9 @@ public class SlotLockRenderer {
       return;
     }
 
-    Component modifierName = Component.translatable(Config.lockModifierKey.getTranslationKey());
+    Component modifierName = Component.translatable(CommonConfig.lockModifierKey.getTranslationKey());
     Component tooltip = Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName);
     guiGraphics.renderTooltip(
-        screen.getMinecraft().font, List.of(tooltip), java.util.Optional.empty(), mouseX, mouseY);
+        screen.font, List.of(tooltip), java.util.Optional.empty(), mouseX, mouseY);
   }
 }

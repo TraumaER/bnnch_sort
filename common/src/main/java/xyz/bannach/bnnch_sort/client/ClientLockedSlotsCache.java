@@ -2,7 +2,6 @@ package xyz.bannach.bnnch_sort.client;
 
 import java.util.HashSet;
 import java.util.Set;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 
 /**
@@ -26,10 +25,9 @@ public class ClientLockedSlotsCache {
    * Handles incoming locked slots sync payloads from the server.
    *
    * @param payload the sync payload containing the locked slot set
-   * @param context the network context
    */
-  public static void handle(SyncLockedSlotsPayload payload, IPayloadContext context) {
-    context.enqueueWork(() -> lockedSlots = Set.copyOf(payload.lockedSlots()));
+  public static void handle(SyncLockedSlotsPayload payload) {
+    lockedSlots = Set.copyOf(payload.lockedSlots());
   }
 
   /**

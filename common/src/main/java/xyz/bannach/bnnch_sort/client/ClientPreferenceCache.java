@@ -1,6 +1,5 @@
 package xyz.bannach.bnnch_sort.client;
 
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
 import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
@@ -56,13 +55,12 @@ public class ClientPreferenceCache {
    * Handles incoming preference sync payloads from the server.
    *
    * <p>This method is registered as the packet handler for {@link SyncPreferencePayload} and
-   * enqueues the cache update on the client thread.
+   * updates the cache on the client thread.
    *
    * @param payload the sync payload containing the new preferences
-   * @param context the network context
    */
-  public static void handle(SyncPreferencePayload payload, IPayloadContext context) {
-    context.enqueueWork(() -> update(payload));
+  public static void handle(SyncPreferencePayload payload) {
+    update(payload);
   }
 
   /**

@@ -192,9 +192,17 @@ public class Config {
       lockModifierKey = LOCK_MODIFIER_KEY.get();
       lockTintColor = parseColor(LOCK_TINT_COLOR.get(), 0x80FFD700);
       showLockTooltip = SHOW_LOCK_TOOLTIP.get();
+      // Mirror values into CommonConfig for use by platform-agnostic client code
+      CommonConfig.showSortButton = showSortButton;
+      CommonConfig.lockModifierKey = lockModifierKey;
+      CommonConfig.lockTintColor = lockTintColor;
+      CommonConfig.showLockTooltip = showLockTooltip;
     } else if (spec == SERVER_SPEC) {
       defaultSortMethod = DEFAULT_SORT_METHOD.get();
       defaultSortOrder = DEFAULT_SORT_ORDER.get();
+      // Mirror values into CommonConfig for use by platform-agnostic code
+      CommonConfig.defaultSortMethod = defaultSortMethod;
+      CommonConfig.defaultSortOrder = defaultSortOrder;
     }
   }
 

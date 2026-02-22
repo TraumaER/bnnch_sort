@@ -3,18 +3,17 @@ package xyz.bannach.bnnch_sort.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import xyz.bannach.bnnch_sort.network.CyclePreferencePayload;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
 import xyz.bannach.bnnch_sort.server.SortHandler;
+import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.util.SlotUtils;
 
 /**
@@ -80,88 +79,68 @@ public class SortKeyHandler {
           "key.categories.bnnch_sort");
 
   /**
-   * Registers the mod's keybindings with the game.
-   *
-   * <p>Called during client initialization via {@link ClientModBusEvents}.
-   *
-   * @param event the key mapping registration event
-   */
-  public static void register(RegisterKeyMappingsEvent event) {
-    event.register(SORT_KEY);
-    event.register(CYCLE_PREFERENCE_KEY);
-  }
-
-  /**
    * Handles keyboard input on container screens.
    *
    * <p>Checks if the pressed key matches either the sort or cycle preference keybind and performs
    * the appropriate action. Uses Post event to run after other mods (e.g., JEI) have had a chance
    * to process the key and cancel it if they're handling text input.
    *
-   * <p>Keybinds are ignored when:
+   * <p>Keybinds are ignored when a text field has focus (e.g., vanilla rename screens).
    *
-   * <ul>
-   *   <li>A text field has focus (e.g., vanilla rename screens)
-   *   <li>Another mod has already canceled the event (e.g., JEI search box is active)
-   * </ul>
-   *
-   * @param event the key pressed event
+   * @param screen the screen on which the key was pressed
+   * @param keyCode the GLFW key code of the pressed key
+   * @param scanCode the platform-specific scan code of the pressed key
+   * @return true if the event was consumed, false otherwise
    */
-  public static void onKeyPressed(ScreenEvent.KeyPressed.Post event) {
-    if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
-      return;
+  public static boolean onKeyPressed(Screen screen, int keyCode, int scanCode) {
+    if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
+      return false;
     }
 
     // Don't process keybinds when typing in a text field (e.g., vanilla rename screens)
-    if (screen.getFocused() instanceof EditBox) {
-      return;
+    if (containerScreen.getFocused() instanceof EditBox) {
+      return false;
     }
-
-    // Don't process if another mod (e.g., JEI) has already handled this key
-    if (event.isCanceled()) {
-      return;
-    }
-
-    InputConstants.Key key = InputConstants.getKey(event.getKeyCode(), event.getScanCode());
 
     // Process our keybinds
-    if (CYCLE_PREFERENCE_KEY.isActiveAndMatches(key)) {
-      PacketDistributor.sendToServer(new CyclePreferencePayload());
+    if (CYCLE_PREFERENCE_KEY.matches(keyCode, scanCode)) {
+      Services.NETWORK.sendToServer(new CyclePreferencePayload());
       SortFeedback.showPreferenceChange(
           ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-      event.setCanceled(true);
-      return;
+      return true;
     }
-    if (SORT_KEY.isActiveAndMatches(key)) {
-      handleSortInput(screen);
-      event.setCanceled(true);
+    if (SORT_KEY.matches(keyCode, scanCode)) {
+      handleSortInput(containerScreen);
+      return true;
     }
+    return false;
   }
 
   /**
    * Handles mouse button input on container screens.
    *
    * <p>Checks if the clicked mouse button matches either the sort or cycle preference keybind and
-   * performs the appropriate action. The event is canceled if a keybind matches.
+   * performs the appropriate action.
    *
-   * @param event the mouse button pressed event
+   * @param screen the screen on which the mouse button was clicked
+   * @param button the GLFW mouse button code
+   * @return true if the event was consumed, false otherwise
    */
-  public static void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
-    if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
-      return;
+  public static boolean onMouseClicked(Screen screen, int button) {
+    if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
+      return false;
     }
-    InputConstants.Key mouseKey = InputConstants.Type.MOUSE.getOrCreate(event.getButton());
-    if (CYCLE_PREFERENCE_KEY.isActiveAndMatches(mouseKey)) {
-      PacketDistributor.sendToServer(new CyclePreferencePayload());
+    if (CYCLE_PREFERENCE_KEY.matchesMouse(button)) {
+      Services.NETWORK.sendToServer(new CyclePreferencePayload());
       SortFeedback.showPreferenceChange(
           ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
-      event.setCanceled(true);
-      return;
+      return true;
     }
-    if (SORT_KEY.isActiveAndMatches(mouseKey)) {
-      handleSortInput(screen);
-      event.setCanceled(true);
+    if (SORT_KEY.matchesMouse(button)) {
+      handleSortInput(containerScreen);
+      return true;
     }
+    return false;
   }
 
   /**
@@ -173,7 +152,7 @@ public class SortKeyHandler {
    * @param screen the container screen receiving input
    */
   private static void handleSortInput(AbstractContainerScreen<?> screen) {
-    Slot hoveredSlot = screen.getSlotUnderMouse();
+    Slot hoveredSlot = screen.hoveredSlot;
     if (hoveredSlot == null) {
       return;
     }
@@ -188,7 +167,7 @@ public class SortKeyHandler {
       return;
     }
 
-    PacketDistributor.sendToServer(new SortRequestPayload(region));
+    Services.NETWORK.sendToServer(new SortRequestPayload(region));
     SortFeedback.showSorted(ClientPreferenceCache.getMethod(), ClientPreferenceCache.getOrder());
   }
 

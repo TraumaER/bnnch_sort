@@ -66,7 +66,7 @@ public class ModPayloads {
     registrar.playToClient(
         SyncPreferencePayload.TYPE,
         SyncPreferencePayload.STREAM_CODEC,
-        ClientPreferenceCache::handle);
+        (payload, context) -> context.enqueueWork(() -> ClientPreferenceCache.handle(payload)));
     registrar.playToServer(
         ToggleLockPayload.TYPE, ToggleLockPayload.STREAM_CODEC,
         (payload, context) -> context.enqueueWork(
@@ -74,6 +74,6 @@ public class ModPayloads {
     registrar.playToClient(
         SyncLockedSlotsPayload.TYPE,
         SyncLockedSlotsPayload.STREAM_CODEC,
-        ClientLockedSlotsCache::handle);
+        (payload, context) -> context.enqueueWork(() -> ClientLockedSlotsCache.handle(payload)));
   }
 }

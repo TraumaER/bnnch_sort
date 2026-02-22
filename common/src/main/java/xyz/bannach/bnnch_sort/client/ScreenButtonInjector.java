@@ -2,8 +2,7 @@ package xyz.bannach.bnnch_sort.client;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 import xyz.bannach.bnnch_sort.server.SortHandler;
 
 /**
@@ -34,7 +33,7 @@ import xyz.bannach.bnnch_sort.server.SortHandler;
  * <p>Button injection only occurs on the client.
  *
  * @see SortButton
- * @see Config#showSortButton
+ * @see CommonConfig#showSortButton
  * @see SortHandler#getTargetSlots
  * @since 1.0.0
  */
@@ -44,23 +43,21 @@ public class ScreenButtonInjector {
   private ScreenButtonInjector() {}
 
   /**
-   * Handles screen initialization to inject sort buttons.
+   * Creates a sort button for the given container screen, if applicable.
    *
-   * <p>Called after a screen is initialized. If the screen is a supported container type and the
-   * button is enabled in config, a {@link SortButton} is added to the screen's widget list.
+   * <p>If the screen is a supported container type and the button is enabled in config, a
+   * {@link SortButton} is returned. Returns null if the screen should not receive a button.
    *
    * <p>This method uses generic container detection: any menu with sortable container slots will
    * receive a sort button, automatically supporting modded containers like MetalBarrels,
    * Sophisticated Storage, and others without requiring hardcoded menu type checks.
    *
-   * @param event the screen initialization event
+   * @param screen the container screen being initialized
+   * @return a new {@link SortButton} to add, or null if not applicable
    */
-  public static void onScreenInit(ScreenEvent.Init.Post event) {
-    if (!Config.showSortButton) {
-      return;
-    }
-    if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
-      return;
+  public static SortButton createButton(AbstractContainerScreen<?> screen) {
+    if (!CommonConfig.showSortButton) {
+      return null;
     }
 
     var menu = screen.getMenu();
@@ -74,10 +71,9 @@ public class ScreenButtonInjector {
       // Fallback to player inventory for standalone inventory screen
       sortRegion = SortHandler.REGION_PLAYER_MAIN;
     } else {
-      return;
+      return null;
     }
 
-    SortButton sortButton = new SortButton(screen, sortRegion);
-    event.addListener(sortButton);
+    return new SortButton(screen, sortRegion);
   }
 }

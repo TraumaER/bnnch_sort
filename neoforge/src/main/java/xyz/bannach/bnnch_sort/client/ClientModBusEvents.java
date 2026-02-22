@@ -34,13 +34,13 @@ public class ClientModBusEvents {
   /**
    * Handles key mapping registration.
    *
-   * <p>Delegates to {@link SortKeyHandler#register(RegisterKeyMappingsEvent)} to register the sort
-   * and preference cycle keybindings.
+   * <p>Registers the sort and preference cycle keybindings from {@link SortKeyHandler}.
    *
    * @param event the key mapping registration event
    */
   @SubscribeEvent
   public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
-    SortKeyHandler.register(event);
+    event.register(SortKeyHandler.SORT_KEY);
+    event.register(SortKeyHandler.CYCLE_PREFERENCE_KEY);
   }
 }

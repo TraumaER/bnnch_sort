@@ -12,14 +12,14 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 
 /**
  * Client-side event handlers for screen interactions and rendering.
  *
  * <p>This class listens to NeoForge screen events on the client side and delegates to the
- * appropriate handler classes. It handles keyboard input, mouse input, screen initialization, and
- * overlay rendering.
+ * appropriate handler classes in common. It is a thin adapter that translates NeoForge event types
+ * into vanilla-typed calls.
  *
  * <h2>Handled Events</h2>
  *
@@ -48,45 +48,58 @@ public class ClientEvents {
   /**
    * Handles keyboard input events on screens.
    *
-   * <p>Delegates to {@link SortKeyHandler#onKeyPressed(ScreenEvent.KeyPressed.Post)} for processing
-   * sort and preference cycle keybinds. Uses Post event to run after other mods (e.g., JEI) have
-   * processed the key, allowing them to cancel the event if they're handling text input.
+   * <p>Delegates to {@link SortKeyHandler#onKeyPressed(net.minecraft.client.gui.screens.Screen,
+   * int, int)} for processing sort and preference cycle keybinds. Uses Post event to run after
+   * other mods (e.g., JEI) have processed the key, allowing them to cancel the event if they're
+   * handling text input.
    *
    * @param event the key pressed event
    */
   @SubscribeEvent
   public static void onKeyPressed(ScreenEvent.KeyPressed.Post event) {
-    SortKeyHandler.onKeyPressed(event);
+    if (event.isCanceled()) return;
+    if (SortKeyHandler.onKeyPressed(event.getScreen(), event.getKeyCode(), event.getScanCode())) {
+      event.setCanceled(true);
+    }
   }
 
   /**
    * Handles mouse button input events on screens.
    *
-   * <p>Delegates to {@link SortKeyHandler#onMouseClicked(ScreenEvent.MouseButtonPressed.Pre)} for
-   * processing sort and preference cycle keybinds bound to mouse buttons.
+   * <p>Delegates to {@link SlotLockInputHandler} and {@link SortKeyHandler} for processing slot
+   * lock and sort/cycle keybinds bound to mouse buttons.
    *
    * @param event the mouse button pressed event
    */
   @SubscribeEvent
   public static void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
-    if (SlotLockInputHandler.onMouseClicked(event)) {
+    if (SlotLockInputHandler.onMouseClicked(
+        event.getScreen(), event.getMouseX(), event.getMouseY(), event.getButton())) {
       event.setCanceled(true);
       return;
     }
-    SortKeyHandler.onMouseClicked(event);
+    if (SortKeyHandler.onMouseClicked(event.getScreen(), event.getButton())) {
+      event.setCanceled(true);
+    }
   }
 
   /**
    * Handles screen initialization events.
    *
-   * <p>Delegates to {@link ScreenButtonInjector#onScreenInit(ScreenEvent.Init.Post)} to inject sort
-   * buttons into supported container screens.
+   * <p>Delegates to {@link ScreenButtonInjector#createButton(AbstractContainerScreen)} to create
+   * sort buttons for supported container screens.
    *
    * @param event the screen initialization event
    */
   @SubscribeEvent
   public static void onScreenInit(ScreenEvent.Init.Post event) {
-    ScreenButtonInjector.onScreenInit(event);
+    if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
+      return;
+    }
+    SortButton button = ScreenButtonInjector.createButton(screen);
+    if (button != null) {
+      event.addListener(button);
+    }
   }
 
   /**
@@ -99,7 +112,7 @@ public class ClientEvents {
    */
   @SubscribeEvent
   public static void onItemTooltip(ItemTooltipEvent event) {
-    if (!Config.showLockTooltip) {
+    if (!CommonConfig.showLockTooltip) {
       return;
     }
     if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) {
@@ -116,7 +129,7 @@ public class ClientEvents {
     if (!ClientLockedSlotsCache.isLocked(containerSlot)) {
       return;
     }
-    Component modifierName = Component.translatable(Config.lockModifierKey.getTranslationKey());
+    Component modifierName = Component.translatable(CommonConfig.lockModifierKey.getTranslationKey());
     event.getToolTip().add(Component.translatable("tooltip.bnnch_sort.slot_locked", modifierName));
   }
 

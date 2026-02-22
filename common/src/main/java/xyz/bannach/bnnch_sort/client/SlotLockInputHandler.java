@@ -7,11 +7,10 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 import xyz.bannach.bnnch_sort.ModifierKey;
 import xyz.bannach.bnnch_sort.network.ToggleLockPayload;
+import xyz.bannach.bnnch_sort.services.Services;
 
 /**
  * Client-side input handler for slot locking via modifier+click.
@@ -29,16 +28,19 @@ public class SlotLockInputHandler {
    *
    * <p>Returns true if the event was consumed (slot lock toggled), false otherwise.
    *
-   * @param event the mouse button pressed event
+   * @param screen the screen on which the mouse button was clicked
+   * @param mouseX the mouse X position
+   * @param mouseY the mouse Y position
+   * @param button the GLFW mouse button code
    * @return true if the click was consumed
    */
-  public static boolean onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
-    if (!(event.getScreen() instanceof AbstractContainerScreen<?> screen)) {
+  public static boolean onMouseClicked(Screen screen, double mouseX, double mouseY, int button) {
+    if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
       return false;
     }
 
     // Only left click
-    if (event.getButton() != 0) {
+    if (button != 0) {
       return false;
     }
 
@@ -48,7 +50,7 @@ public class SlotLockInputHandler {
     }
 
     // Check hovered slot is player inventory (0-35)
-    Slot hoveredSlot = screen.getSlotUnderMouse();
+    Slot hoveredSlot = containerScreen.hoveredSlot;
     if (hoveredSlot == null) {
       return false;
     }
@@ -61,7 +63,7 @@ public class SlotLockInputHandler {
     }
 
     // Send toggle to server
-    PacketDistributor.sendToServer(new ToggleLockPayload(slotIndex));
+    Services.NETWORK.sendToServer(new ToggleLockPayload(slotIndex));
 
     // Optimistic client update for immediate feedback
     ClientLockedSlotsCache.toggleLocal(slotIndex);
@@ -75,7 +77,7 @@ public class SlotLockInputHandler {
   }
 
   private static boolean isModifierDown() {
-    ModifierKey key = Config.lockModifierKey;
+    ModifierKey key = CommonConfig.lockModifierKey;
     return switch (key) {
       case ALT -> Screen.hasAltDown();
       case CONTROL -> Screen.hasControlDown();
