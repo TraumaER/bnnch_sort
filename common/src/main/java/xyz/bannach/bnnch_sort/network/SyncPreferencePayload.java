@@ -21,8 +21,7 @@ import xyz.bannach.bnnch_sort.sorting.SortOrder;
  *
  * <h2>Handling</h2>
  *
- * <p>Handled by {@link ClientPreferenceCache#handle(SyncPreferencePayload,
- * net.neoforged.neoforge.network.handling.IPayloadContext)}
+ * <p>Dispatched to the platform-specific payload handler on the client side.
  *
  * @param method the player's current sort method
  * @param order the player's current sort order

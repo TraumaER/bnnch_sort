@@ -32,6 +32,6 @@ public class SlotUtils {
     String className = slot.getClass().getName();
     // Allow base Slot class and NeoForge's SlotItemHandler (used by modded containers)
     return slot.getClass() == Slot.class
-        || className.equals("net.neoforged.neoforge.items.SlotItemHandler");
+        || className.equals("net.neoforged.neoforge.items.SlotItemHandler"); // NeoForge-specific modded slot; always false on Fabric
   }
 }

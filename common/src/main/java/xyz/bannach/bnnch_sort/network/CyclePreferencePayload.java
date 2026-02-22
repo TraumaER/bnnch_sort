@@ -19,8 +19,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * <h2>Handling</h2>
  *
- * <p>Handled by {@link PreferenceHandler#handle(CyclePreferencePayload,
- * net.neoforged.neoforge.network.handling.IPayloadContext)}
+ * <p>Dispatched to the platform-specific payload handler on the server side.
  *
  * @see PreferenceHandler
  * @see SyncPreferencePayload

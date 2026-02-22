@@ -19,8 +19,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * <h2>Handling</h2>
  *
- * <p>Handled by {@link SortHandler#handle(SortRequestPayload,
- * net.neoforged.neoforge.network.handling.IPayloadContext)}
+ * <p>Dispatched to the platform-specific payload handler on the server side.
  *
  * @param region the inventory region to sort (see {@link SortHandler} for region constants)
  * @see SortHandler#REGION_CONTAINER
