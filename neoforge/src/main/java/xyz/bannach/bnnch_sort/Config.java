@@ -123,11 +123,11 @@ public class Config {
   /**
    * The tint color applied to locked slots as an ARGB integer.
    *
-   * <p>Default: {@code 0x800000FF} (semi-transparent blue)
+   * <p>Default: {@code 0x80FFD700} (semi-transparent gold)
    *
    * <p>Side: Client only
    */
-  public static int lockTintColor = 0x800000FF;
+  public static int lockTintColor = 0x80FFD700;
 
   /**
    * Whether to show a tooltip when hovering over an empty locked slot.

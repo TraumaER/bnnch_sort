@@ -20,9 +20,8 @@ import xyz.bannach.bnnch_sort.sorting.SortOrder;
  *
  * <h2>Rendering</h2>
  *
- * <p>Messages are rendered by {@link
- * ClientEvents#onScreenRender(net.neoforged.neoforge.client.event.ScreenEvent.Render.Post)} as a
- * centered overlay at the top of the screen.
+ * <p>Messages are rendered by the platform's screen render handler as a centered overlay at the
+ * top of the screen.
  *
  * <h2>Side: Client-only</h2>
  *

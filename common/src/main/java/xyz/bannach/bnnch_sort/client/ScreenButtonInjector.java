@@ -26,7 +26,7 @@ import xyz.bannach.bnnch_sort.server.SortHandler;
  *
  * <h2>Configuration</h2>
  *
- * <p>Button injection can be disabled via the {@link Config#showSortButton} setting.
+ * <p>Button injection can be disabled via the {@link CommonConfig#showSortButton} setting.
  *
  * <h2>Side: Client-only</h2>
  *
