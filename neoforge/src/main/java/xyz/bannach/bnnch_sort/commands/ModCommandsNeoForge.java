@@ -4,7 +4,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 /**
@@ -29,7 +29,7 @@ public class ModCommandsNeoForge {
   public static void onRegisterCommands(RegisterCommandsEvent event) {
     ModCommands.register(
         event.getDispatcher(),
-        () -> new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder),
-        () -> Config.showSortButton);
+        () -> new SortPreference(CommonConfig.defaultSortMethod, CommonConfig.defaultSortOrder),
+        () -> CommonConfig.showSortButton);
   }
 }

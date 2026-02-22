@@ -27,7 +27,7 @@ import org.slf4j.Logger;
  *
  * <p>This class is loaded on both client and server sides.
  *
- * @see Config
+ * @see NeoForgeConfig
  * @see ModAttachments
  * @since 1.0.0
  */
@@ -52,8 +52,8 @@ public class BnnchSort {
   public BnnchSort(IEventBus modEventBus, ModContainer modContainer) {
     modEventBus.addListener(this::commonSetup);
     xyz.bannach.bnnch_sort.ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
-    modContainer.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
-    modContainer.registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
+    modContainer.registerConfig(ModConfig.Type.CLIENT, NeoForgeConfig.CLIENT_SPEC);
+    modContainer.registerConfig(ModConfig.Type.SERVER, NeoForgeConfig.SERVER_SPEC);
   }
 
   /**

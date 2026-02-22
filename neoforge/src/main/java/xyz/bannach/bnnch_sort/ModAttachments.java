@@ -47,8 +47,8 @@ public class ModAttachments {
    * and order. The attachment has the following properties:
    *
    * <ul>
-   *   <li>Default value: Created from {@link Config#defaultSortMethod} and {@link
-   *       Config#defaultSortOrder}
+   *   <li>Default value: Created from {@link CommonConfig#defaultSortMethod} and {@link
+   *       CommonConfig#defaultSortOrder}
    *   <li>Serialization: Uses {@link SortPreference#CODEC} for NBT persistence
    *   <li>Death behavior: Preserved across player death (copyOnDeath)
    * </ul>
@@ -58,7 +58,7 @@ public class ModAttachments {
           "sort_preference",
           () ->
               AttachmentType.builder(
-                      () -> new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder))
+                      () -> new SortPreference(CommonConfig.defaultSortMethod, CommonConfig.defaultSortOrder))
                   .serialize(SortPreference.CODEC)
                   .copyOnDeath()
                   .build());

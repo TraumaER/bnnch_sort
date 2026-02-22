@@ -12,7 +12,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import xyz.bannach.bnnch_sort.Config;
+import xyz.bannach.bnnch_sort.CommonConfig;
 import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.server.SortHandler;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
@@ -161,7 +161,7 @@ public class CommandGameTests {
     // Verify initial preference
     SortPreference initial = player.getData(ModAttachments.SORT_PREFERENCE);
     helper.assertTrue(
-        initial.method() == Config.defaultSortMethod, "Initial method should be default");
+        initial.method() == CommonConfig.defaultSortMethod, "Initial method should be default");
 
     // Simulate /bnnchsort change quantity descending
     SortPreference newPref = new SortPreference(SortMethod.QUANTITY, SortOrder.DESCENDING);
@@ -191,15 +191,15 @@ public class CommandGameTests {
 
     // Simulate /bnnchsort reset - reset to config defaults
     SortPreference defaultPref =
-        new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder);
+        new SortPreference(CommonConfig.defaultSortMethod, CommonConfig.defaultSortOrder);
     player.setData(ModAttachments.SORT_PREFERENCE, defaultPref);
 
     // Verify preference was reset to defaults
     SortPreference pref = player.getData(ModAttachments.SORT_PREFERENCE);
     helper.assertTrue(
-        pref.method() == Config.defaultSortMethod, "Method should be reset to config default");
+        pref.method() == CommonConfig.defaultSortMethod, "Method should be reset to config default");
     helper.assertTrue(
-        pref.order() == Config.defaultSortOrder, "Order should be reset to config default");
+        pref.order() == CommonConfig.defaultSortOrder, "Order should be reset to config default");
 
     helper.succeed();
   }
