@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import xyz.bannach.bnnch_sort.fabric.platform.FabricConfigLoader;
 import xyz.bannach.bnnch_sort.fabric.server.FabricServerEvents;
 import xyz.bannach.bnnch_sort.network.CyclePreferencePayload;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
@@ -18,6 +19,8 @@ public class BnnchSortFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        FabricConfigLoader.load();
+
         // Register payload types (both directions)
         PayloadTypeRegistry.playC2S().register(
             SortRequestPayload.TYPE, SortRequestPayload.STREAM_CODEC);
