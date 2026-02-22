@@ -11,7 +11,6 @@ import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
 import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.sorting.LockedSlots;
-import xyz.bannach.bnnch_sort.sorting.SortOrder;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 public class FabricServerEvents {
