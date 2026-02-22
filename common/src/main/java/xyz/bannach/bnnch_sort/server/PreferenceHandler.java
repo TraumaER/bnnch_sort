@@ -1,11 +1,9 @@
 package xyz.bannach.bnnch_sort.server;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.CyclePreferencePayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
+import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
 /**
@@ -44,20 +42,12 @@ public class PreferenceHandler {
    * saves the new preferences, and sends a sync packet to update the client's cache.
    *
    * @param payload the cycle preference payload (contains no data)
-   * @param context the network context containing the sending player
+   * @param player the server player sending the request
    */
-  public static void handle(CyclePreferencePayload payload, IPayloadContext context) {
-    context.enqueueWork(
-        () -> {
-          ServerPlayer player = (ServerPlayer) context.player();
-          SortPreference current = player.getData(ModAttachments.SORT_PREFERENCE);
-
-          SortPreference updated = current.next();
-
-          player.setData(ModAttachments.SORT_PREFERENCE, updated);
-
-          PacketDistributor.sendToPlayer(
-              player, new SyncPreferencePayload(updated.method(), updated.order()));
-        });
+  public static void handle(CyclePreferencePayload payload, ServerPlayer player) {
+    SortPreference current = Services.PLAYER_DATA.getPreference(player);
+    SortPreference updated = current.next();
+    Services.PLAYER_DATA.setPreference(player, updated);
+    Services.NETWORK.sendToPlayer(player, new SyncPreferencePayload(updated.method(), updated.order()));
   }
 }

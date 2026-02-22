@@ -12,9 +12,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.SortRequestPayload;
+import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.sorting.ItemSorter;
 import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
@@ -83,8 +82,7 @@ public class SortHandler {
    * Handles an incoming sort request from a client.
    *
    * <p>This method validates the request, determines target slots, extracts items, sorts them using
-   * the player's preferences, and writes the sorted items back to the slots. The operation is
-   * enqueued on the main server thread.
+   * the player's preferences, and writes the sorted items back to the slots.
    *
    * <p><strong>Guard Conditions:</strong>
    *
@@ -95,24 +93,20 @@ public class SortHandler {
    * </ul>
    *
    * @param payload the sort request containing the target region
-   * @param context the network context containing the sending player
+   * @param player the server player sending the request
    */
-  public static void handle(SortRequestPayload payload, IPayloadContext context) {
-    context.enqueueWork(
-        () -> {
-          ServerPlayer player = (ServerPlayer) context.player();
-          if (player.isSpectator()) return;
+  public static void handle(SortRequestPayload payload, ServerPlayer player) {
+    if (player.isSpectator()) return;
 
-          AbstractContainerMenu menu = player.containerMenu;
-          if (payload.region() == REGION_CONTAINER && menu == player.inventoryMenu) return;
+    AbstractContainerMenu menu = player.containerMenu;
+    if (payload.region() == REGION_CONTAINER && menu == player.inventoryMenu) return;
 
-          int region = payload.region();
-          if (region == REGION_PLAYER_MAIN || region == REGION_PLAYER_HOTBAR) {
-            sortRegion(player, menu, region);
-          } else {
-            sortContainerRegion(menu, player);
-          }
-        });
+    int region = payload.region();
+    if (region == REGION_PLAYER_MAIN || region == REGION_PLAYER_HOTBAR) {
+      sortRegion(player, menu, region);
+    } else {
+      sortContainerRegion(menu, player);
+    }
   }
 
   /**
@@ -133,7 +127,7 @@ public class SortHandler {
     }
 
     List<ItemStack> sorted =
-        ItemSorter.sort(stacks, player.getData(ModAttachments.SORT_PREFERENCE));
+        ItemSorter.sort(stacks, Services.PLAYER_DATA.getPreference(player));
 
     for (int i = 0; i < targetSlots.size(); i++) {
       targetSlots.get(i).set(sorted.get(i));
@@ -158,8 +152,8 @@ public class SortHandler {
       return;
     }
 
-    LockedSlots lockedSlots = player.getData(ModAttachments.LOCKED_SLOTS);
-    SortPreference preference = player.getData(ModAttachments.SORT_PREFERENCE);
+    LockedSlots lockedSlots = Services.PLAYER_DATA.getLockedSlots(player);
+    SortPreference preference = Services.PLAYER_DATA.getPreference(player);
 
     // Partition into locked and unlocked
     List<Slot> locked = new ArrayList<>();

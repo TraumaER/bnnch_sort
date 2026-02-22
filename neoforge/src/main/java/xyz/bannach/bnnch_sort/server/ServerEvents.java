@@ -4,11 +4,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
+import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortPreference;
 
@@ -29,7 +28,6 @@ import xyz.bannach.bnnch_sort.sorting.SortPreference;
  * <p>These events only fire on the server (or integrated server for singleplayer).
  *
  * @see SyncPreferencePayload
- * @see ModAttachments#SORT_PREFERENCE
  * @since 1.0.0
  */
 @EventBusSubscriber(modid = BnnchSort.MODID)
@@ -50,12 +48,11 @@ public class ServerEvents {
   @SubscribeEvent
   public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
     if (event.getEntity() instanceof ServerPlayer player) {
-      SortPreference pref = player.getData(ModAttachments.SORT_PREFERENCE);
-      PacketDistributor.sendToPlayer(
-          player, new SyncPreferencePayload(pref.method(), pref.order()));
+      SortPreference pref = Services.PLAYER_DATA.getPreference(player);
+      Services.NETWORK.sendToPlayer(player, new SyncPreferencePayload(pref.method(), pref.order()));
 
-      LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
-      PacketDistributor.sendToPlayer(player, new SyncLockedSlotsPayload(locked.slots()));
+      LockedSlots locked = Services.PLAYER_DATA.getLockedSlots(player);
+      Services.NETWORK.sendToPlayer(player, new SyncLockedSlotsPayload(locked.slots()));
     }
   }
 }

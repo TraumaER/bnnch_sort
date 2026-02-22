@@ -1,5 +1,6 @@
 package xyz.bannach.bnnch_sort.network;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -54,17 +55,22 @@ public class ModPayloads {
   public static void register(RegisterPayloadHandlersEvent event) {
     PayloadRegistrar registrar = event.registrar("1");
     registrar.playToServer(
-        SortRequestPayload.TYPE, SortRequestPayload.STREAM_CODEC, SortHandler::handle);
+        SortRequestPayload.TYPE, SortRequestPayload.STREAM_CODEC,
+        (payload, context) -> context.enqueueWork(
+            () -> SortHandler.handle(payload, (ServerPlayer) context.player())));
     registrar.playToServer(
         CyclePreferencePayload.TYPE,
         CyclePreferencePayload.STREAM_CODEC,
-        PreferenceHandler::handle);
+        (payload, context) -> context.enqueueWork(
+            () -> PreferenceHandler.handle(payload, (ServerPlayer) context.player())));
     registrar.playToClient(
         SyncPreferencePayload.TYPE,
         SyncPreferencePayload.STREAM_CODEC,
         ClientPreferenceCache::handle);
     registrar.playToServer(
-        ToggleLockPayload.TYPE, ToggleLockPayload.STREAM_CODEC, LockHandler::handle);
+        ToggleLockPayload.TYPE, ToggleLockPayload.STREAM_CODEC,
+        (payload, context) -> context.enqueueWork(
+            () -> LockHandler.handle(payload, (ServerPlayer) context.player())));
     registrar.playToClient(
         SyncLockedSlotsPayload.TYPE,
         SyncLockedSlotsPayload.STREAM_CODEC,

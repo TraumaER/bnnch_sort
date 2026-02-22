@@ -5,6 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -12,16 +14,10 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import xyz.bannach.bnnch_sort.BnnchSort;
-import xyz.bannach.bnnch_sort.Config;
-import xyz.bannach.bnnch_sort.ModAttachments;
 import xyz.bannach.bnnch_sort.network.SyncLockedSlotsPayload;
 import xyz.bannach.bnnch_sort.network.SyncPreferencePayload;
 import xyz.bannach.bnnch_sort.server.SortHandler;
+import xyz.bannach.bnnch_sort.services.Services;
 import xyz.bannach.bnnch_sort.sorting.LockedSlots;
 import xyz.bannach.bnnch_sort.sorting.SortMethod;
 import xyz.bannach.bnnch_sort.sorting.SortOrder;
@@ -48,11 +44,9 @@ import xyz.bannach.bnnch_sort.sorting.SortPreference;
  * <p>Commands are registered on both sides but execute server-side.
  *
  * @see SortHandler
- * @see ItemSorter
  * @see SortPreference
  * @since 1.0.0
  */
-@EventBusSubscriber(modid = BnnchSort.MODID)
 public class ModCommands {
 
   /** Private constructor to prevent instantiation of this utility class. */
@@ -88,17 +82,19 @@ public class ModCommands {
               Arrays.stream(SortOrder.values()).map(SortOrder::getSerializedName), builder);
 
   /**
-   * Registers all mod commands during the command registration event.
+   * Registers all mod commands with the given command dispatcher.
    *
    * <p>This method builds and registers the complete {@code /bnnchsort} command tree with all
    * subcommands and their argument handlers.
    *
-   * @param event the command registration event
+   * @param dispatcher the command dispatcher to register commands with
+   * @param defaultPreference supplier for the server-configured default sort preference
+   * @param showSortButton supplier for whether the sort button is enabled
    */
-  @SubscribeEvent
-  public static void onRegisterCommands(RegisterCommandsEvent event) {
-    CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-
+  public static void register(
+      CommandDispatcher<CommandSourceStack> dispatcher,
+      Supplier<SortPreference> defaultPreference,
+      BooleanSupplier showSortButton) {
     dispatcher.register(
         Commands.literal("bnnchsort")
             .then(
@@ -111,7 +107,7 @@ public class ModCommands {
                                 context ->
                                     executeSortInv(
                                         context, StringArgumentType.getString(context, "region")))))
-            .then(Commands.literal("help").executes(ModCommands::executeHelp))
+            .then(Commands.literal("help").executes(context -> executeHelp(context, defaultPreference)))
             .then(Commands.literal("unlock").executes(ModCommands::executeUnlock))
             .then(
                 Commands.literal("change")
@@ -122,16 +118,19 @@ public class ModCommands {
                                 Commands.argument("order", StringArgumentType.word())
                                     .suggests(ORDER_SUGGESTIONS)
                                     .executes(ModCommands::executeChange))))
-            .then(Commands.literal("reset").executes(ModCommands::executeReset))
+            .then(Commands.literal("reset").executes(context -> executeReset(context, defaultPreference)))
             .then(
                 Commands.literal("config")
-                    .executes(context -> executeConfig(context, null))
+                    .executes(context -> executeConfig(context, null, defaultPreference, showSortButton))
                     .then(
                         Commands.argument("key", StringArgumentType.word())
                             .executes(
                                 context ->
                                     executeConfig(
-                                        context, StringArgumentType.getString(context, "key"))))));
+                                        context,
+                                        StringArgumentType.getString(context, "key"),
+                                        defaultPreference,
+                                        showSortButton)))));
   }
 
   /**
@@ -210,7 +209,7 @@ public class ModCommands {
       return 0;
     }
 
-    LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
+    LockedSlots locked = Services.PLAYER_DATA.getLockedSlots(player);
     if (locked.slots().isEmpty()) {
       context
           .getSource()
@@ -219,8 +218,8 @@ public class ModCommands {
     }
 
     int count = locked.slots().size();
-    player.setData(ModAttachments.LOCKED_SLOTS, LockedSlots.EMPTY);
-    PacketDistributor.sendToPlayer(player, new SyncLockedSlotsPayload(LockedSlots.EMPTY.slots()));
+    Services.PLAYER_DATA.setLockedSlots(player, LockedSlots.EMPTY);
+    Services.NETWORK.sendToPlayer(player, new SyncLockedSlotsPayload(LockedSlots.EMPTY.slots()));
 
     context
         .getSource()
@@ -236,14 +235,16 @@ public class ModCommands {
    * <p>Shows all available commands and the player's current sort preferences.
    *
    * @param context the command context containing the source
+   * @param defaultPreference supplier for the server-configured default sort preference
    * @return 1 (always succeeds)
    */
-  private static int executeHelp(CommandContext<CommandSourceStack> context) {
+  private static int executeHelp(
+      CommandContext<CommandSourceStack> context, Supplier<SortPreference> defaultPreference) {
     ServerPlayer player = context.getSource().getPlayer();
     SortPreference current =
         player != null
-            ? player.getData(ModAttachments.SORT_PREFERENCE)
-            : new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder);
+            ? Services.PLAYER_DATA.getPreference(player)
+            : defaultPreference.get();
 
     context
         .getSource()
@@ -274,7 +275,7 @@ public class ModCommands {
             false);
 
     if (player != null) {
-      LockedSlots locked = player.getData(ModAttachments.LOCKED_SLOTS);
+      LockedSlots locked = Services.PLAYER_DATA.getLockedSlots(player);
       int mainLocked = locked.countInRange(9, 35);
       int hotbarLocked = locked.countInRange(0, 8);
       context
@@ -327,9 +328,8 @@ public class ModCommands {
     }
 
     SortPreference newPreference = new SortPreference(method, order);
-    player.setData(ModAttachments.SORT_PREFERENCE, newPreference);
-
-    PacketDistributor.sendToPlayer(player, new SyncPreferencePayload(method, order));
+    Services.PLAYER_DATA.setPreference(player, newPreference);
+    Services.NETWORK.sendToPlayer(player, new SyncPreferencePayload(method, order));
 
     context
         .getSource()
@@ -351,9 +351,11 @@ public class ModCommands {
    * to the client.
    *
    * @param context the command context containing the source
+   * @param defaultPreference supplier for the server-configured default sort preference
    * @return 1 on success, 0 on failure (not a player)
    */
-  private static int executeReset(CommandContext<CommandSourceStack> context) {
+  private static int executeReset(
+      CommandContext<CommandSourceStack> context, Supplier<SortPreference> defaultPreference) {
     ServerPlayer player = context.getSource().getPlayer();
     if (player == null) {
       context
@@ -362,12 +364,10 @@ public class ModCommands {
       return 0;
     }
 
-    SortPreference defaultPreference =
-        new SortPreference(Config.defaultSortMethod, Config.defaultSortOrder);
-    player.setData(ModAttachments.SORT_PREFERENCE, defaultPreference);
-
-    PacketDistributor.sendToPlayer(
-        player, new SyncPreferencePayload(defaultPreference.method(), defaultPreference.order()));
+    SortPreference pref = defaultPreference.get();
+    Services.PLAYER_DATA.setPreference(player, pref);
+    Services.NETWORK.sendToPlayer(
+        player, new SyncPreferencePayload(pref.method(), pref.order()));
 
     context
         .getSource()
@@ -375,8 +375,8 @@ public class ModCommands {
             () ->
                 Component.translatable(
                     "command.bnnch_sort.reset.success",
-                    Component.translatable(defaultPreference.method().getTranslationKey()),
-                    Component.translatable(defaultPreference.order().getTranslationKey())),
+                    Component.translatable(pref.method().getTranslationKey()),
+                    Component.translatable(pref.order().getTranslationKey())),
             false);
 
     return 1;
@@ -390,9 +390,16 @@ public class ModCommands {
    *
    * @param context the command context containing the source
    * @param key the config key to display, or null for all keys
+   * @param defaultPreference supplier for the server-configured default sort preference
+   * @param showSortButton supplier for whether the sort button is enabled
    * @return 1 on success, 0 on failure (invalid key)
    */
-  private static int executeConfig(CommandContext<CommandSourceStack> context, String key) {
+  private static int executeConfig(
+      CommandContext<CommandSourceStack> context,
+      String key,
+      Supplier<SortPreference> defaultPreference,
+      BooleanSupplier showSortButton) {
+    SortPreference pref = defaultPreference.get();
     if (key == null) {
       context
           .getSource()
@@ -403,7 +410,7 @@ public class ModCommands {
               () ->
                   Component.translatable(
                       "command.bnnch_sort.config.method",
-                      Component.translatable(Config.defaultSortMethod.getTranslationKey())),
+                      Component.translatable(pref.method().getTranslationKey())),
               false);
       context
           .getSource()
@@ -411,14 +418,15 @@ public class ModCommands {
               () ->
                   Component.translatable(
                       "command.bnnch_sort.config.order",
-                      Component.translatable(Config.defaultSortOrder.getTranslationKey())),
+                      Component.translatable(pref.order().getTranslationKey())),
               false);
       context
           .getSource()
           .sendSuccess(
               () ->
                   Component.translatable(
-                      "command.bnnch_sort.config.button", String.valueOf(Config.showSortButton)),
+                      "command.bnnch_sort.config.button",
+                      String.valueOf(showSortButton.getAsBoolean())),
               false);
     } else {
       switch (key.toLowerCase()) {
@@ -429,7 +437,7 @@ public class ModCommands {
                     () ->
                         Component.translatable(
                             "command.bnnch_sort.config.method",
-                            Component.translatable(Config.defaultSortMethod.getTranslationKey())),
+                            Component.translatable(pref.method().getTranslationKey())),
                     false);
         case "order" ->
             context
@@ -438,7 +446,7 @@ public class ModCommands {
                     () ->
                         Component.translatable(
                             "command.bnnch_sort.config.order",
-                            Component.translatable(Config.defaultSortOrder.getTranslationKey())),
+                            Component.translatable(pref.order().getTranslationKey())),
                     false);
         case "button" ->
             context
@@ -447,7 +455,7 @@ public class ModCommands {
                     () ->
                         Component.translatable(
                             "command.bnnch_sort.config.button",
-                            String.valueOf(Config.showSortButton)),
+                            String.valueOf(showSortButton.getAsBoolean())),
                     false);
         default -> {
           context
