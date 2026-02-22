@@ -25,7 +25,7 @@ import xyz.bannach.bnnch_sort.BnnchSort;
  * @see SortKeyHandler
  * @since 1.0.0
  */
-@EventBusSubscriber(modid = BnnchSort.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = BnnchSort.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientModBusEvents {
 
   /** Private constructor to prevent instantiation of this utility class. */
