@@ -7,7 +7,7 @@ import xyz.bannach.bnnch_sort.sorting.SortOrder;
  * Platform-agnostic configuration values for the Bnnch: Sort mod.
  *
  * <p>This class holds the runtime configuration values that are populated by the platform-specific
- * config loader (e.g., NeoForge's {@code Config.java} or Fabric's JSON config loader). Client-side
+ * config loader (e.g., NeoForge's {@code NeoForgeConfig.java} or Fabric's JSON config loader). Client-side
  * code in common should read values from this class rather than from the platform config directly.
  *
  * <h2>Side: Common</h2>
