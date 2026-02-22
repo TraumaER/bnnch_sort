@@ -45,13 +45,13 @@ public class FabricClientEvents {
             ScreenKeyboardEvents.afterKeyPress(screen).register(
                 (s, key, scancode, modifiers) -> SortKeyHandler.onKeyPressed(s, key, scancode));
 
-            // Mouse events — sort on click and lock on alt+click
-            ScreenMouseEvents.beforeMouseClick(screen).register(
-                (s, mouseX, mouseY, button2) -> SortKeyHandler.onMouseClicked(s, (int) button2));
-
+            // Mouse events — lock handler first (higher priority, matches NeoForge), then sort
             ScreenMouseEvents.beforeMouseClick(screen).register(
                 (s, mouseX, mouseY, button2) ->
                     SlotLockInputHandler.onMouseClicked(s, mouseX, mouseY, (int) button2));
+
+            ScreenMouseEvents.beforeMouseClick(screen).register(
+                (s, mouseX, mouseY, button2) -> SortKeyHandler.onMouseClicked(s, (int) button2));
 
             // Render events — lock overlays, lock tooltip, and sort feedback overlay
             ScreenEvents.afterRender(screen).register(
