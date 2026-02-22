@@ -13,8 +13,8 @@ import java.util.Set;
  *
  * <h2>Persistence</h2>
  *
- * <p>Locked slots are persisted using the {@link #CODEC} for NBT serialization and attached to
- * players via {@link xyz.bannach.bnnch_sort.ModAttachments#LOCKED_SLOTS}.
+ * <p>Locked slots are persisted using the {@link #CODEC} for NBT serialization and stored by
+ * the platform-specific player data service.
  *
  * <h2>Side: Common</h2>
  *

@@ -30,7 +30,7 @@ public class FabricConfigLoader {
             if (data == null) return;
             if (data.showSortButton != null)    CommonConfig.showSortButton    = data.showSortButton;
             if (data.lockModifierKey != null)   CommonConfig.lockModifierKey   = ModifierKey.valueOf(data.lockModifierKey);
-            if (data.lockTintColor != null)     CommonConfig.lockTintColor     = (int) Long.parseLong(data.lockTintColor, 16);
+            if (data.lockTintColor != null)     CommonConfig.lockTintColor     = parseColor(data.lockTintColor, CommonConfig.lockTintColor);
             if (data.showLockTooltip != null)   CommonConfig.showLockTooltip   = data.showLockTooltip;
             if (data.defaultSortMethod != null) CommonConfig.defaultSortMethod = SortMethod.valueOf(data.defaultSortMethod);
             if (data.defaultSortOrder != null)  CommonConfig.defaultSortOrder  = SortOrder.valueOf(data.defaultSortOrder);
@@ -44,12 +44,29 @@ public class FabricConfigLoader {
             ConfigData data = new ConfigData();
             data.showSortButton    = CommonConfig.showSortButton;
             data.lockModifierKey   = CommonConfig.lockModifierKey.name();
-            data.lockTintColor     = String.format("%08X", CommonConfig.lockTintColor);
+            // Store as RGBA hex to match NeoForge's config format
+            int argb = CommonConfig.lockTintColor;
+            data.lockTintColor = String.format("%02X%02X%02X%02X",
+                (argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, (argb >> 24) & 0xFF);
             data.showLockTooltip   = CommonConfig.showLockTooltip;
             data.defaultSortMethod = CommonConfig.defaultSortMethod.name();
             data.defaultSortOrder  = CommonConfig.defaultSortOrder.name();
             GSON.toJson(data, writer);
         } catch (IOException ignored) {}
+    }
+
+    /** Parses a hex RGBA color string and converts it to an ARGB integer. */
+    private static int parseColor(String hex, int fallback) {
+        try {
+            long rgba = Long.parseLong(hex, 16);
+            int r = (int) ((rgba >> 24) & 0xFF);
+            int g = (int) ((rgba >> 16) & 0xFF);
+            int b = (int) ((rgba >> 8) & 0xFF);
+            int a = (int) (rgba & 0xFF);
+            return (a << 24) | (r << 16) | (g << 8) | b;
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 
     private static class ConfigData {

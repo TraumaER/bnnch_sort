@@ -12,8 +12,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  *
  * <h2>Persistence</h2>
  *
- * <p>Sort preferences are persisted using the {@link #CODEC} for NBT serialization and attached to
- * players via {@link xyz.bannach.bnnch_sort.ModAttachments#SORT_PREFERENCE}.
+ * <p>Sort preferences are persisted using the {@link #CODEC} for NBT serialization and stored
+ * by the platform-specific player data service.
  *
  * <h2>Side: Common</h2>
  *
@@ -37,7 +37,7 @@ public record SortPreference(SortMethod method, SortOrder order) {
   /**
    * Codec for serializing and deserializing SortPreference to/from NBT.
    *
-   * <p>Used by {@link xyz.bannach.bnnch_sort.ModAttachments} for player data persistence.
+   * <p>Used by the platform-specific player data service for persistence.
    */
   public static final Codec<SortPreference> CODEC =
       RecordCodecBuilder.create(
