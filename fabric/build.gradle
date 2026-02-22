@@ -48,6 +48,7 @@ processResources {
     inputs.property 'mod_license', mod_license
     inputs.property 'minecraft_version', minecraft_version
     inputs.property 'fabric_loader_version', fabric_loader_version
+    inputs.property 'fabric_api_version', fabric_api_version
     filteringCharset = 'UTF-8'
     filesMatching('fabric.mod.json') {
         expand(
@@ -58,7 +59,8 @@ processResources {
             mod_authors: mod_authors,
             mod_license: mod_license,
             minecraft_version: minecraft_version,
-            fabric_loader_version: fabric_loader_version
+            fabric_loader_version: fabric_loader_version,
+            fabric_api_version: fabric_api_version
         )
     }
 }
