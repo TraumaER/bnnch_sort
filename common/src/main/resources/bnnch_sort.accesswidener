@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+# AbstractContainerScreen fields used by client UI classes
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
+
+# Screen.font field used for rendering tooltips
+accessible field net/minecraft/client/gui/screens/Screen font Lnet/minecraft/client/gui/Font;

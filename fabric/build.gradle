@@ -1,0 +1,66 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+}
+
+version = "${mod_version}+mc${minecraft_version}"
+group = mod_group_id
+
+base {
+    archivesName = "${mod_id}-fabric"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+loom {
+    accessWidenerPath = project(':common').file("src/main/resources/bnnch_sort.accesswidener")
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    compileOnly project(':common')
+}
+
+// Compile common before fabric
+tasks.compileJava.dependsOn(':common:compileJava')
+
+// Merge common classes into the fabric jar
+jar {
+    from(project(':common').sourceSets.main.output)
+}
+
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mod_id', mod_id
+    inputs.property 'mod_name', mod_name
+    inputs.property 'mod_description', mod_description
+    inputs.property 'mod_authors', mod_authors
+    inputs.property 'mod_license', mod_license
+    inputs.property 'minecraft_version', minecraft_version
+    inputs.property 'fabric_loader_version', fabric_loader_version
+    inputs.property 'fabric_api_version', fabric_api_version
+    filteringCharset = 'UTF-8'
+    filesMatching('fabric.mod.json') {
+        expand(
+            version: project.version,
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_description: mod_description,
+            mod_authors: mod_authors,
+            mod_license: mod_license,
+            minecraft_version: minecraft_version,
+            fabric_loader_version: fabric_loader_version,
+            fabric_api_version: fabric_api_version
+        )
+    }
+}

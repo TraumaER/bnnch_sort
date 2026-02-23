@@ -1,0 +1,52 @@
+package xyz.bannach.bnnch_sort.network;
+
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Network payload sent from client to server to cycle sort preferences.
+ *
+ * <p>This payload is sent when the player presses the cycle preference keybind. It has no data
+ * content; the server advances the player's preferences to the next combination and responds with a
+ * {@link SyncPreferencePayload}.
+ *
+ * <h2>Direction</h2>
+ *
+ * <p>Client → Server
+ *
+ * <h2>Handling</h2>
+ *
+ * <p>Dispatched to the platform-specific payload handler on the server side.
+ *
+ * @see PreferenceHandler
+ * @see SyncPreferencePayload
+ * @see xyz.bannach.bnnch_sort.sorting.SortPreference#next()
+ * @since 1.0.0
+ */
+public record CyclePreferencePayload() implements CustomPacketPayload {
+
+  /** The payload type identifier for registration and dispatch. */
+  public static final Type<CyclePreferencePayload> TYPE =
+      new Type<>(ResourceLocation.fromNamespaceAndPath("bnnch_sort", "cycle_preference"));
+
+  /**
+   * Codec for encoding and decoding this payload.
+   *
+   * <p>Uses a unit codec since this payload carries no data.
+   */
+  public static final StreamCodec<ByteBuf, CyclePreferencePayload> STREAM_CODEC =
+      StreamCodec.unit(new CyclePreferencePayload());
+
+  /**
+   * Returns the payload type for this packet.
+   *
+   * @return the registered payload type
+   */
+  @Override
+  public @NotNull Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
+}
